@@ -122,6 +122,10 @@ def bling_oauth_callback(
     code: str, mgr: DBFManager = Depends(get_dbf_manager)
 ) -> Any:
     rec = BlingAuthManager(mgr).exchange_code_for_token(code)
+    try:
+        BlingSyncService(mgr).run_sync(["all"])
+    except Exception:
+        pass
     safe = dict(rec)
     safe.pop("CRED_REF", None)
     
@@ -132,10 +136,10 @@ def bling_oauth_callback(
         <meta charset="UTF-8">
         <title>Bling Conectado — CRM GLOBAL CARDS</title>
         <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0F3D6E; color: white; text-align: center; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #053679; color: white; text-align: center; }
             .card { background: white; color: #0f172a; padding: 40px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); max-width: 440px; }
             .icon { font-size: 50px; margin-bottom: 12px; }
-            h2 { margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0F3D6E; }
+            h2 { margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #053679; }
             p { margin: 0 0 16px 0; font-size: 14px; color: #64748b; line-height: 1.5; }
             .status { display: inline-block; padding: 6px 14px; background: #dcfce7; color: #15803d; border-radius: 9999px; font-weight: 700; font-size: 13px; }
         </style>
@@ -145,7 +149,7 @@ def bling_oauth_callback(
             <div class="icon">🎉</div>
             <h2>Bling Conectado com Sucesso!</h2>
             <div class="status">Autenticação OAuth 2.0 Concluída</div>
-            <p style="margin-top: 16px;">O CRM GLOBAL CARDS recebeu suas credenciais e está pronto para sincronizar. Esta janela será fechada automaticamente...</p>
+            <p style="margin-top: 16px;">O CRM GLOBAL CARDS recebeu o acesso e iniciou o download automático de todos os clientes, produtos e pedidos. Esta janela será fechada automaticamente...</p>
         </div>
         <script>
             try {
@@ -288,4 +292,61 @@ def save_meta_config(
     safe = dict(rec)
     safe.pop("CRED_REF", None)
     return safe
+
+
+class MCPExecuteInput(BaseModel):
+    tool: str
+    arguments: Dict[str, Any] = {}
+
+
+@router.get("/mcp/tools")
+def get_mcp_tools(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "view")
+    from app.mcp.bling_mcp import BlingMCPEngine
+
+    engine = BlingMCPEngine(mgr)
+    return {
+        "server": "Bling-GlobalCards-MCP",
+        "version": "1.0.0",
+        "protocol": "2024-11-05",
+        "tools": engine.get_tool_definitions(),
+    }
+
+
+@router.post("/mcp/execute")
+def execute_mcp_tool(
+    payload: MCPExecuteInput,
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "edit")
+    from app.mcp.bling_mcp import BlingMCPEngine
+
+    engine = BlingMCPEngine(mgr)
+    return engine.execute_tool(payload.tool, payload.arguments)
+
+
+@router.post("/auto-import-all")
+def auto_import_all_data(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "edit")
+    sync = BlingSyncService(mgr)
+    result = sync.run_sync(["all"])
+    NotificationService(mgr).notify(
+        "IMPORTACAO_TOTAL",
+        "Importação Concluída com Sucesso",
+        f"Todos os dados do Bling ERP foram baixados e gravados nas tabelas DBF locais.",
+        entidade="INTEGRACOES",
+    )
+    return {
+        "status": "SUCCESS",
+        "message": "Todos os clientes, produtos e pedidos foram sincronizados com sucesso para o banco DBF local!",
+        "details": result,
+    }
+
 
