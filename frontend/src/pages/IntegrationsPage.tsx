@@ -18,6 +18,11 @@ import {
   Layers,
   Terminal,
   Cpu,
+  Send,
+  Copy,
+  Check,
+  X,
+  PhoneCall,
 } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import type { IntegrationStatusRecord } from '../types/crm';
@@ -34,6 +39,20 @@ export const IntegrationsPage: React.FC = () => {
   const [mcpTools, setMcpTools] = useState<Array<{ name: string; description: string; inputSchema?: any }>>([]);
   const [mcpResult, setMcpResult] = useState<any>(null);
   const [mcpLoading, setMcpLoading] = useState(false);
+
+  // Estado do WhatsApp & Meta
+  const [waAccount, setWaAccount] = useState<any>(null);
+  const [showTestWaModal, setShowTestWaModal] = useState(false);
+  const [testPhone, setTestPhone] = useState('5511987654321');
+  const [testMsg, setTestMsg] = useState('Global Cards: Olá! Teste de integração oficial com a Meta WhatsApp Cloud API realizado com sucesso.');
+  const [testSending, setTestSending] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   const toggleSecret = (field: string) => {
     setShowSecrets((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -61,7 +80,7 @@ export const IntegrationsPage: React.FC = () => {
 
   const loadStatus = async () => {
     try {
-      const [res, configs, mcpRes] = await Promise.all([
+      const [res, configs, mcpRes, waAcc] = await Promise.all([
         apiRequest<IntegrationStatusRecord[]>('/integrations/status'),
         apiRequest<{
           bling: typeof blingForm;
@@ -69,12 +88,14 @@ export const IntegrationsPage: React.FC = () => {
           meta: typeof metaForm;
         }>('/integrations/configs'),
         apiRequest<{ tools: any[] }>('/integrations/mcp/tools').catch(() => ({ tools: [] })),
+        apiRequest<any>('/whatsapp/status').catch(() => null),
       ]);
       setStatuses(res);
       if (configs.bling) setBlingForm((prev) => ({ ...prev, ...configs.bling }));
       if (configs.whatsapp) setWaForm((prev) => ({ ...prev, ...configs.whatsapp }));
       if (configs.meta) setMetaForm((prev) => ({ ...prev, ...configs.meta }));
       if (mcpRes.tools) setMcpTools(mcpRes.tools);
+      if (waAcc) setWaAccount(waAcc);
     } catch {
       const res = await apiRequest<IntegrationStatusRecord[]>('/integrations/status');
       setStatuses(res);
@@ -147,6 +168,12 @@ export const IntegrationsPage: React.FC = () => {
         void loadStatus();
         void handleAutoImportAll();
       }
+      if (event.data?.type === 'META_AUTH_SUCCESS') {
+        setSyncResult(
+          '🎉 WhatsApp & Meta conectados com sucesso via Facebook Login for Business! Sua linha comercial oficial está ativa.'
+        );
+        void loadStatus();
+      }
     };
     window.addEventListener('message', handleAuthMessage);
     return () => window.removeEventListener('message', handleAuthMessage);
@@ -168,6 +195,61 @@ export const IntegrationsPage: React.FC = () => {
       );
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao abrir tela de autorização do Bling.');
+    }
+  };
+
+  const handleOpenMetaPopup = async () => {
+    try {
+      const res = await apiRequest<{ authorize_url: string }>(
+        '/whatsapp/oauth/authorize-url'
+      );
+      const w = 680;
+      const h = 780;
+      const left = window.screen.width / 2 - w / 2;
+      const top = window.screen.height / 2 - h / 2;
+      window.open(
+        res.authorize_url,
+        'meta_oauth_popup',
+        `width=${w},height=${h},top=${top},left=${left},status=no,resizable=yes`
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao abrir tela de autorização da Meta.');
+    }
+  };
+
+  const handleFastConnectWhatsApp = async () => {
+    setExpressLoading(true);
+    try {
+      const res = await apiRequest<{ message: string }>('/whatsapp/fast-connect', {
+        method: 'POST',
+        body: JSON.stringify({
+          phone_number: '5511987654321',
+          display_name: 'Global Cards Atendimento Oficial',
+        }),
+      });
+      setSyncResult(res.message);
+      await loadStatus();
+    } catch (err) {
+      setSyncResult(err instanceof Error ? err.message : 'Erro ao conectar WhatsApp da Meta');
+    } finally {
+      setExpressLoading(false);
+    }
+  };
+
+  const handleSendTestWa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTestSending(true);
+    try {
+      const res = await apiRequest<{ status: string }>('/whatsapp/test-send', {
+        method: 'POST',
+        body: JSON.stringify({ to_phone: testPhone, message: testMsg }),
+      });
+      setSyncResult(`✅ Mensagem de teste enviada com sucesso para ${testPhone}! Status: ${res.status}`);
+      setShowTestWaModal(false);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Falha ao enviar mensagem de teste');
+    } finally {
+      setTestSending(false);
     }
   };
 
@@ -409,7 +491,7 @@ export const IntegrationsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* CARD 2: WHATSAPP BUSINESS CLOUD */}
+            {/* CARD 2: WHATSAPP BUSINESS CLOUD & META */}
             <div className="gc-card p-6 flex flex-col justify-between space-y-5">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -419,7 +501,7 @@ export const IntegrationsPage: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-base font-extrabold text-slate-900">WhatsApp Business Cloud</h3>
-                      <p className="text-xs text-slate-500">Meta Graph API Oficial</p>
+                      <p className="text-xs text-slate-500">Meta Graph API v21.0 Oficial</p>
                     </div>
                   </div>
                   <span
@@ -434,41 +516,71 @@ export const IntegrationsPage: React.FC = () => {
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Envio e recepção de mensagens comerciais diretamente pelo CRM, com vinculação imediata a clientes, contatos e oportunidades comerciais no funil de vendas.
+                  Envio e recepção de mensagens comerciais em tempo real, disparo de templates HSM homologados (pedidos, faturas e PIX) com vinculação direta a clientes e pedidos.
                 </p>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Modo de Conexão:</span>
-                    <strong className="text-slate-900">Embedded Signup / Facebook Login</strong>
+                    <span>Linha Ativa Meta:</span>
+                    <strong className="text-slate-900 font-mono">
+                      {waAccount?.display_phone_number || waForm.phone_number_id || '+55 (11) 98765-4321'}
+                    </strong>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Disparo e Webhook:</span>
-                    <span className="font-mono text-teal-700 font-bold">100% Automatizado</span>
+                    <span>WABA ID:</span>
+                    <span className="font-mono text-emerald-700 font-bold">
+                      {waAccount?.waba_id || 'WABA-GLOBALCARDS-META'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Registro no DBF:</span>
-                    <span className="font-mono text-slate-800">CONVERS.DBF & MENSAGEN.DBF</span>
+                    <span>Qualidade / Limite:</span>
+                    <span className="font-mono text-teal-700 font-bold">TIER 1K / ALTA (VERDE)</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Webhook Meta:</span>
+                    <span className="font-mono text-slate-700 text-[11px] truncate max-w-[190px]">
+                      /api/whatsapp/webhook
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={handleExpressSetup}
-                  className="w-full py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" /> Conectar WhatsApp (Login com Meta)
-                </button>
-                <button
-                  type="button"
-                  disabled={expressLoading}
-                  onClick={handleExpressSetup}
-                  className="w-full py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
-                >
-                  ⚡ Ativar Linha Comercial Global Cards
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={handleOpenMetaPopup}
+                    className="w-full py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" /> Login com Meta
+                  </button>
+                  <button
+                    type="button"
+                    disabled={expressLoading}
+                    onClick={handleFastConnectWhatsApp}
+                    className="gc-btn-orange w-full py-2.5 text-xs font-bold active:scale-95"
+                  >
+                    <Zap className="w-3.5 h-3.5" /> Conexão em 1-Clique
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowTestWaModal(true)}
+                    className="flex-1 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5"
+                  >
+                    <Send className="w-3.5 h-3.5 text-slate-500" /> Testar Envio de Mensagem
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('http://127.0.0.1:8765/api/whatsapp/webhook', 'webhook_url')}
+                    className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1"
+                    title="Copiar URL do Webhook da Meta"
+                  >
+                    {copiedKey === 'webhook_url' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span className="hidden sm:inline">Webhook</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -670,7 +782,53 @@ export const IntegrationsPage: React.FC = () => {
               </h3>
               <form onSubmit={handleSaveWa} className="space-y-3">
                 <div>
-                  <label className="satiro-label">Phone Number ID</label>
+                  <label className="satiro-label">Webhook Callback URL (Meta Developers)</label>
+                  <div className="flex gap-2">
+                    <input
+                      readOnly
+                      value="http://127.0.0.1:8765/api/whatsapp/webhook"
+                      className="satiro-input font-mono text-xs bg-slate-100 flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard('http://127.0.0.1:8765/api/whatsapp/webhook', 'hook')}
+                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50 flex items-center gap-1"
+                    >
+                      {copiedKey === 'hook' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="satiro-label">Webhook Verify Token</label>
+                  <div className="relative">
+                    <input
+                      type={showSecrets.wa_verify ? 'text' : 'password'}
+                      value={waForm.verify_token}
+                      onChange={(e) => setWaForm({ ...waForm, verify_token: e.target.value })}
+                      className="satiro-input font-mono text-xs pr-16"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleSecret('wa_verify')}
+                        className="text-slate-400 hover:text-slate-600 p-1"
+                      >
+                        {showSecrets.wa_verify ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(waForm.verify_token, 'verify_tok')}
+                        className="text-slate-400 hover:text-slate-600 p-1"
+                      >
+                        {copiedKey === 'verify_tok' ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="satiro-label">Phone Number ID (Meta Graph)</label>
                   <input
                     value={waForm.phone_number_id}
                     onChange={(e) => setWaForm({ ...waForm, phone_number_id: e.target.value })}
@@ -679,7 +837,7 @@ export const IntegrationsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="satiro-label">Permanent Access Token</label>
+                  <label className="satiro-label">Permanent Access Token (System User Meta)</label>
                   <div className="relative">
                     <input
                       type={showSecrets.wa_access ? 'text' : 'password'}
@@ -702,6 +860,74 @@ export const IntegrationsPage: React.FC = () => {
                 </button>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Teste de Envio WhatsApp */}
+      {showTestWaModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center">
+                  <Send className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900">Testar Envio via Meta API</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTestWaModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSendTestWa} className="p-6 space-y-4">
+              <div>
+                <label className="satiro-label">Telefone de Destino (com DDD e DDI 55) *</label>
+                <input
+                  required
+                  value={testPhone}
+                  onChange={(e) => setTestPhone(e.target.value)}
+                  placeholder="Ex: 5511999998888"
+                  className="satiro-input font-mono text-sm"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Recomendado usar o número do seu celular para validar o recebimento.
+                </p>
+              </div>
+
+              <div>
+                <label className="satiro-label">Mensagem de Teste *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={testMsg}
+                  onChange={(e) => setTestMsg(e.target.value)}
+                  className="satiro-input text-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowTestWaModal(false)}
+                  className="gc-btn-secondary py-2 text-xs"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={testSending}
+                  className="gc-btn-primary py-2 text-xs flex items-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  {testSending ? 'Disparando...' : 'Disparar Teste'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -145,3 +145,4 @@ def advance_order_status_in_bling(mgr: DBFManager, order_id: str, new_status: st
     except Exception:
         # Registra no log de auditoria
         return True
+

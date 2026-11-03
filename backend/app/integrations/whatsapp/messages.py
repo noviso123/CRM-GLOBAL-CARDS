@@ -206,3 +206,106 @@ class WhatsAppService:
             out.append(item)
         return out
 
+    def list_templates(self) -> List[Dict[str, Any]]:
+        """Retorna lista de templates HSM oficiais pré-aprovados para uso comercial."""
+        return [
+            {
+                "id": "confirmacao_pedido",
+                "name": "confirmacao_pedido",
+                "label": "Confirmação de Pedido",
+                "category": "UTILITY",
+                "description": "Notifica o cliente sobre a confirmação e aprovação do pedido de venda.",
+                "example": "Olá {{1}}, confirmamos o seu pedido {{2}} no valor de R$ {{3}} na Global Cards!",
+                "parameters": ["Nome do Cliente", "Número do Pedido", "Valor Total"],
+            },
+            {
+                "id": "pedido_faturado",
+                "name": "pedido_faturado",
+                "label": "Pedido Faturado & Expedição",
+                "category": "UTILITY",
+                "description": "Informa emissão da nota fiscal e envio para produção/transporte.",
+                "example": "Olá {{1}}, seu pedido {{2}} foi faturado! A nota fiscal foi emitida e os produtos estão em rota.",
+                "parameters": ["Nome do Cliente", "Número do Pedido"],
+            },
+            {
+                "id": "orcamento_gerado",
+                "name": "orcamento_gerado",
+                "label": "Proposta Comercial / Orçamento",
+                "category": "MARKETING",
+                "description": "Envia aviso de orçamento gerado com condições exclusivas.",
+                "example": "Olá {{1}}, preparamos sua cotação nº {{2}} na Global Cards! Confira os preços especiais.",
+                "parameters": ["Nome do Cliente", "Número do Orçamento"],
+            },
+            {
+                "id": "cobranca_pix",
+                "name": "cobranca_pix",
+                "label": "Cobrança com Chave PIX",
+                "category": "UTILITY",
+                "description": "Envia chave PIX e valor para liquidação rápida do pedido.",
+                "example": "Olá {{1}}, segue os dados para pagamento via PIX do seu pedido {{2}} no valor de R$ {{3}}.",
+                "parameters": ["Nome do Cliente", "Número do Pedido", "Valor"],
+            },
+            {
+                "id": "boas_vindas",
+                "name": "boas_vindas",
+                "label": "Boas-vindas ao Cliente",
+                "category": "MARKETING",
+                "description": "Primeiro contato comercial amigável da Global Cards.",
+                "example": "Olá {{1}}, seja bem-vindo à Global Cards! Como podemos ajudar com seus crachás e cordões hoje?",
+                "parameters": ["Nome do Cliente"],
+            },
+        ]
+
+    def send_template(
+        self,
+        conv_id: str,
+        template_name: str,
+        parameters: Optional[List[str]] = None,
+        user_id: str = "SYSTEM",
+    ) -> Dict[str, Any]:
+        """Dispara template oficial via Meta Cloud API e registra no histórico da conversa."""
+        conv = self.mgr.get_by_id("CONVERS", conv_id)
+        if not conv:
+            raise NotFoundErrorCRM("CONVERS", conv_id)
+
+        params = parameters or []
+        dispatch = self.cloud.send_cloud_template_message(
+            to_phone=conv["TELEFONE"],
+            template_name=template_name,
+            parameters=params,
+        )
+
+        preview_text = f"[TEMPLATE: {template_name}] " + " | ".join(str(p) for p in params)
+        msg_rec = self.mgr.insert(
+            "MENSAGEN",
+            {
+                "ID_CONVERS": conv_id,
+                "DIRECAO": "SAIDA",
+                "TIPO_MSG": "TEMPLATE",
+                "CONTEUDO": preview_text[:250],
+                "STATUS_ENT": "ENTREGUE" if dispatch.get("dispatched_external") else "PENDENTE",
+                "ID_USUARIO": user_id,
+                "ID_EXT": dispatch.get("wamid", ""),
+                "DT_ENVIO": now_iso(),
+            },
+        )
+
+        self.mgr.update(
+            "CONVERS",
+            conv_id,
+            {
+                "ULT_MSG": preview_text[:160],
+                "DT_ULT_MSG": msg_rec["DT_ENVIO"],
+                "NAO_LIDAS": 0,
+            },
+        )
+
+        if conv.get("ID_CLIENTE"):
+            self.mgr.update("CLIENTES", conv["ID_CLIENTE"], {"DT_ULT_INT": now_iso()})
+
+        return {
+            "message": msg_rec,
+            "dispatch": dispatch,
+            "template": template_name,
+        }
+

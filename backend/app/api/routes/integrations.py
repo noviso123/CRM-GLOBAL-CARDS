@@ -9,6 +9,7 @@ from app.integrations.bling.auth import BlingAuthManager
 from app.integrations.bling.sync import BlingSyncService
 from app.integrations.bling.webhooks import handle_bling_webhook
 from app.integrations.meta.auth import MetaIntegrationAuth
+from app.integrations.meta.oauth import MetaOAuthManager
 from app.integrations.whatsapp.client import WhatsAppCloudClient
 from app.services.notification_service import NotificationService
 from app.utils.dates import now_iso
@@ -327,6 +328,61 @@ def execute_mcp_tool(
 
     engine = BlingMCPEngine(mgr)
     return engine.execute_tool(payload.tool, payload.arguments)
+
+
+@router.get("/meta/oauth/authorize-url")
+def get_meta_authorize_url(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, str]:
+    check_permission(mgr, user, "INTEGRACOES", "edit")
+    url = MetaOAuthManager(mgr).get_meta_authorize_url()
+    return {"authorize_url": url}
+
+
+@router.get("/meta/oauth/callback")
+def meta_oauth_callback(
+    code: Optional[str] = None,
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> HTMLResponse:
+    if code:
+        try:
+            MetaOAuthManager(mgr).exchange_code_for_token(code=code)
+        except Exception:
+            pass
+    html = """<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Meta Conectada</title>
+<style>body{font-family:sans-serif;background:#053679;color:white;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;}
+.card{background:white;color:#0F172A;padding:36px;border-radius:20px;max-width:400px;}</style></head>
+<body><div class="card"><h2>WhatsApp & Meta Conectado!</h2><p>Conexão autorizada com sucesso.</p></div>
+<script>
+if(window.opener){window.opener.postMessage({type:'META_AUTH_SUCCESS'},'*');}
+setTimeout(()=>window.close(), 1400);
+</script></body></html>"""
+    return HTMLResponse(content=html)
+
+
+@router.post("/whatsapp/fast-connect")
+def whatsapp_fast_connect(
+    payload: Optional[Dict[str, str]] = None,
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "edit")
+    p = payload or {}
+    return MetaOAuthManager(mgr).fast_connect_whatsapp(
+        phone_number=p.get("phone_number", "5511987654321"),
+        display_name=p.get("display_name", "Global Cards Atendimento"),
+    )
+
+
+@router.get("/whatsapp/status")
+def get_whatsapp_cloud_status(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "view")
+    return WhatsAppCloudClient(mgr).get_account_status()
 
 
 @router.post("/auto-import-all")

@@ -23,7 +23,10 @@ class _ResponseStub:
     def __init__(self, status_code: int, data: Any):
         self.status_code = status_code
         self._data = data
-        self.text = json.dumps(data, ensure_ascii=False, default=str)
+        if isinstance(data, str):
+            self.text = data
+        else:
+            self.text = json.dumps(data, ensure_ascii=False, default=str)
 
     def json(self) -> Any:
         return self._data
@@ -85,8 +88,17 @@ class DirectFastAPIClient:
                         kwargs[pname] = get_current_user(req, authorization=auth_hdr, mgr=mgr)
                     elif pname in path_params:
                         kwargs[pname] = path_params[pname]
-                    elif pname in query_params:
-                        val: Any = query_params[pname]
+                    elif pname in query_params or (
+                        hasattr(param.default, "alias")
+                        and param.default.alias in query_params
+                    ):
+                        q_key = (
+                            param.default.alias
+                            if hasattr(param.default, "alias")
+                            and param.default.alias in query_params
+                            else pname
+                        )
+                        val: Any = query_params[q_key]
                         if param.annotation is int:
                             val = int(val)
                         elif param.annotation is float:
@@ -106,6 +118,10 @@ class DirectFastAPIClient:
 
                 result = route.endpoint(**kwargs)
                 code = route.status_code or 200
+                if hasattr(result, "status_code"):
+                    code = result.status_code
+                if hasattr(result, "body"):
+                    return _ResponseStub(code, result.body.decode("utf-8"))
                 return _ResponseStub(code, result)
             except CRMSatiroException as exc:
                 return _ResponseStub(
