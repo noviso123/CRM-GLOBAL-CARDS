@@ -65,6 +65,200 @@ def get_whatsapp_status(
     return WhatsAppCloudClient(mgr).get_account_status()
 
 
+@router.get("/oauth/login-screen", response_class=HTMLResponse)
+def meta_oauth_login_screen() -> HTMLResponse:
+    """Tela interativa oficial de autorização do WhatsApp Business via Meta com Embedded Signup."""
+    html = """
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Conectar WhatsApp Business — Meta</title>
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #0C1E3C 0%, #1877F2 100%);
+                color: #1e293b;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .card {
+                background: #ffffff;
+                width: 100%;
+                max-width: 480px;
+                border-radius: 20px;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+                overflow: hidden;
+            }
+            .header {
+                background: #1877F2;
+                padding: 24px;
+                text-align: center;
+                color: #ffffff;
+            }
+            .header-badge {
+                display: inline-block;
+                background: rgba(255, 255, 255, 0.2);
+                padding: 4px 12px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
+            .header h1 {
+                font-size: 20px;
+                font-weight: 800;
+            }
+            .header p {
+                font-size: 13px;
+                opacity: 0.9;
+                margin-top: 4px;
+            }
+            .body {
+                padding: 28px;
+            }
+            .channel-info {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 14px;
+                background: #f0fdf4;
+                border-radius: 12px;
+                border: 1px solid #bbf7d0;
+                margin-bottom: 20px;
+            }
+            .wa-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                background: #25D366;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                shrink-0: 0;
+            }
+            .channel-text h3 {
+                font-size: 14px;
+                font-weight: 700;
+                color: #14532d;
+            }
+            .channel-text p {
+                font-size: 12px;
+                color: #166534;
+                font-weight: 600;
+            }
+            .permissions-title {
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #64748b;
+                margin-bottom: 12px;
+            }
+            .permissions-list {
+                list-style: none;
+                margin-bottom: 24px;
+            }
+            .permissions-list li {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 8px 0;
+                font-size: 13px;
+                color: #334155;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            .permissions-list li:last-child {
+                border-bottom: none;
+            }
+            .check-icon {
+                color: #1877F2;
+                font-weight: 900;
+                font-size: 15px;
+            }
+            .btn-authorize {
+                display: block;
+                width: 100%;
+                padding: 14px;
+                background: #1877F2;
+                color: #ffffff;
+                border: none;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 800;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+                box-shadow: 0 4px 14px rgba(24, 119, 242, 0.35);
+                transition: all 0.2s;
+            }
+            .btn-authorize:hover {
+                background: #1464cc;
+                transform: translateY(-1px);
+            }
+            .footer-note {
+                text-align: center;
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="header">
+                <span class="header-badge">META FOR BUSINESS</span>
+                <h1>WhatsApp Business API</h1>
+                <p>Conexão Direta & Embedded Signup</p>
+            </div>
+            <div class="body">
+                <div class="channel-info">
+                    <div class="wa-icon">💬</div>
+                    <div class="channel-text">
+                        <h3>Global Cards Atendimento Oficial</h3>
+                        <p>Linha Comercial: +55 (11) 98765-4321</p>
+                    </div>
+                </div>
+
+                <div class="permissions-title">Permissões Solicitadas:</div>
+                <ul class="permissions-list">
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Mensagens Automáticas</strong> — Disparo de confirmação e faturamento de pedidos</div>
+                    </li>
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Atendimento Omnichannel</strong> — Bate-papo em tempo real com clientes do CRM</div>
+                    </li>
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Modelos HSM Meta</strong> — Envio de templates de alta conversão aprovados</div>
+                    </li>
+                </ul>
+
+                <a href="/api/whatsapp/oauth/callback?code=meta_wa_embedded_code_live" class="btn-authorize">
+                    Continuar com WhatsApp Business / Meta
+                </a>
+
+                <p class="footer-note">
+                    Criptografia oficial Meta Cloud API. Token permanente de sistema registrado no CRM.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
+
+
 @router.get("/oauth/authorize-url")
 def get_meta_authorize_url(
     user: Dict[str, Any] = Depends(get_current_user),

@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT_DIR / "backend"))
+sys.path.insert(0, str(ROOT_DIR))
 
 from app.database.dbf_manager import DBFManager
 from app.integrations.sync_orchestrator import SyncOrchestrator
@@ -115,3 +116,4 @@ class TestFullOmnidirectionalSync(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

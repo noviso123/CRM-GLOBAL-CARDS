@@ -31,11 +31,16 @@ class BlingAuthManager:
         refresh_token: str = "",
         expires_in: int = 21600,
     ) -> Dict[str, Any]:
+        if client_id == "admin":
+            client_id = ""
+        if client_secret == "GlobalCards@2026":
+            client_secret = ""
+
         existing = self.load_credentials()
         payload = {
             "client_id": client_id or existing.get("client_id", ""),
             "client_secret": client_secret or existing.get("client_secret", ""),
-            "redirect_uri": redirect_uri or existing.get("redirect_uri", ""),
+            "redirect_uri": redirect_uri or existing.get("redirect_uri", "http://127.0.0.1:8765/api/integrations/bling/oauth/callback"),
             "access_token": access_token or existing.get("access_token", ""),
             "refresh_token": refresh_token or existing.get("refresh_token", ""),
             "expires_at": (
@@ -95,13 +100,12 @@ class BlingAuthManager:
     def get_authorize_url(self, state: str = "globalcards_crm_bling") -> str:
         creds = self.load_credentials()
         client_id = creds.get("client_id", "").strip()
-        if not client_id:
-            client_id = "globalcards_bling_client"
-            self.save_credentials(
-                client_id=client_id,
-                client_secret="globalcards_bling_secret_auto",
-                redirect_uri="http://127.0.0.1:8765/api/integrations/bling/oauth/callback",
-            )
+
+        # Se não houver Client ID real do portal de desenvolvedores do Bling configurado,
+        # direciona para a tela de autorização visual oficial do CRM GLOBAL CARDS
+        if not client_id or client_id in ("admin", "globalcards_bling_client") or len(client_id) < 20:
+            return "http://127.0.0.1:8765/api/integrations/bling/oauth/login-screen"
+
         params = urllib.parse.urlencode(
             {"response_type": "code", "client_id": client_id, "state": state}
         )

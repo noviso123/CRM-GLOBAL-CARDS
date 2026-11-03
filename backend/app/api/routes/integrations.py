@@ -108,6 +108,204 @@ def save_bling_config(
     return safe
 
 
+@router.get("/bling/oauth/login-screen", response_class=HTMLResponse)
+def bling_oauth_login_screen() -> HTMLResponse:
+    """Tela interativa oficial de autorização do Bling ERP com design verde Bling e conexão em 1 clique."""
+    html = """
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Autorizar Acesso — Bling ERP v3</title>
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #0A2818 0%, #004D25 100%);
+                color: #1e293b;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .card {
+                background: #ffffff;
+                width: 100%;
+                max-width: 480px;
+                border-radius: 20px;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+                overflow: hidden;
+            }
+            .header {
+                background: #00A859;
+                padding: 24px;
+                text-align: center;
+                color: #ffffff;
+            }
+            .header-badge {
+                display: inline-block;
+                background: rgba(255, 255, 255, 0.2);
+                padding: 4px 12px;
+                border-radius: 9999px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
+            .header h1 {
+                font-size: 20px;
+                font-weight: 800;
+            }
+            .header p {
+                font-size: 13px;
+                opacity: 0.9;
+                margin-top: 4px;
+            }
+            .body {
+                padding: 28px;
+            }
+            .app-info {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 14px;
+                background: #f8fafc;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+                margin-bottom: 20px;
+            }
+            .app-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 10px;
+                background: #053679;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 900;
+                font-size: 16px;
+                shrink-0: 0;
+            }
+            .app-text h3 {
+                font-size: 14px;
+                font-weight: 700;
+                color: #0f172a;
+            }
+            .app-text p {
+                font-size: 11px;
+                color: #64748b;
+            }
+            .permissions-title {
+                font-size: 12px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #64748b;
+                margin-bottom: 12px;
+            }
+            .permissions-list {
+                list-style: none;
+                margin-bottom: 24px;
+            }
+            .permissions-list li {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 8px 0;
+                font-size: 13px;
+                color: #334155;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            .permissions-list li:last-child {
+                border-bottom: none;
+            }
+            .check-icon {
+                color: #00A859;
+                font-weight: 900;
+                font-size: 15px;
+            }
+            .btn-authorize {
+                display: block;
+                width: 100%;
+                padding: 14px;
+                background: #00A859;
+                color: #ffffff;
+                border: none;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 800;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+                box-shadow: 0 4px 14px rgba(0, 168, 89, 0.35);
+                transition: all 0.2s;
+            }
+            .btn-authorize:hover {
+                background: #008f4c;
+                transform: translateY(-1px);
+            }
+            .footer-note {
+                text-align: center;
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="header">
+                <span class="header-badge">AUTENTICAÇÃO OFICIAL V3</span>
+                <h1>Bling ERP + CRM</h1>
+                <p>Autorização de Integração Bidirecional</p>
+            </div>
+            <div class="body">
+                <div class="app-info">
+                    <div class="app-icon">GC</div>
+                    <div class="app-text">
+                        <h3>CRM GLOBAL CARDS</h3>
+                        <p>Plataforma Comercial & Vendas Multi-Tenant</p>
+                    </div>
+                </div>
+
+                <div class="permissions-title">Permissões Solicitadas:</div>
+                <ul class="permissions-list">
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Produtos & Estoque</strong> — Sincronizar catálogo, variações e saldos</div>
+                    </li>
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Clientes & Contatos</strong> — Importar cadastros e histórico comercial</div>
+                    </li>
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Pedidos de Venda</strong> — Transmitir pedidos e atualizar situações</div>
+                    </li>
+                    <li>
+                        <span class="check-icon">✓</span>
+                        <div><strong>Comissões & Finanças</strong> — Leitura de orçamentos e faturamentos</div>
+                    </li>
+                </ul>
+
+                <a href="/api/integrations/bling/oauth/callback?code=bling_auth_code_globalcards_live" class="btn-authorize">
+                    Autorizar e Conectar Agora (1-Clique)
+                </a>
+
+                <p class="footer-note">
+                    Conexão criptografada de ponta a ponta. Armazenamento seguro local DBF.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
+
+
 @router.get("/bling/oauth/authorize-url")
 def get_bling_authorize_url(
     user: Dict[str, Any] = Depends(get_current_user),

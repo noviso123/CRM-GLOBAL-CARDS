@@ -790,26 +790,30 @@ export const IntegrationsPage: React.FC = () => {
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <Plug className="w-5 h-5 text-[#053679]" /> Credenciais Manuais Bling API v3
               </h3>
-              <form onSubmit={handleSaveBling} className="space-y-3">
+              <form onSubmit={handleSaveBling} className="space-y-3" autoComplete="off">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="satiro-label">Client ID</label>
+                    <label className="satiro-label">Client ID (Bling Developer)</label>
                     <input
+                      name="bling_dev_api_client_id"
+                      autoComplete="new-password"
                       value={blingForm.client_id}
                       onChange={(e) => setBlingForm({ ...blingForm, client_id: e.target.value })}
                       className="satiro-input font-mono text-xs"
-                      placeholder="globalcards_bling_client"
+                      placeholder="Ex: c47b98a09f3e... (Portal Bling)"
                     />
                   </div>
                   <div>
-                    <label className="satiro-label">Client Secret</label>
+                    <label className="satiro-label">Client Secret (Bling Developer)</label>
                     <div className="relative">
                       <input
+                        name="bling_dev_api_client_secret"
+                        autoComplete="new-password"
                         type={showSecrets.bling_secret ? 'text' : 'password'}
                         value={blingForm.client_secret}
                         onChange={(e) => setBlingForm({ ...blingForm, client_secret: e.target.value })}
                         className="satiro-input font-mono text-xs pr-9"
-                        placeholder="••••••••"
+                        placeholder="••••••••••••••••"
                       />
                       <button
                         type="button"
@@ -881,7 +885,7 @@ export const IntegrationsPage: React.FC = () => {
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-teal-600" /> Credenciais Manuais WhatsApp & Meta
               </h3>
-              <form onSubmit={handleSaveWa} className="space-y-3">
+              <form onSubmit={handleSaveWa} className="space-y-3" autoComplete="off">
                 <div>
                   <label className="satiro-label">Webhook Callback URL (Meta Developers)</label>
                   <div className="flex gap-2">
@@ -904,6 +908,8 @@ export const IntegrationsPage: React.FC = () => {
                   <label className="satiro-label">Webhook Verify Token</label>
                   <div className="relative">
                     <input
+                      name="meta_wa_webhook_verify_token"
+                      autoComplete="new-password"
                       type={showSecrets.wa_verify ? 'text' : 'password'}
                       value={waForm.verify_token}
                       onChange={(e) => setWaForm({ ...waForm, verify_token: e.target.value })}
@@ -931,6 +937,8 @@ export const IntegrationsPage: React.FC = () => {
                 <div>
                   <label className="satiro-label">Phone Number ID (Meta Graph)</label>
                   <input
+                    name="meta_wa_phone_number_identifier"
+                    autoComplete="new-password"
                     value={waForm.phone_number_id}
                     onChange={(e) => setWaForm({ ...waForm, phone_number_id: e.target.value })}
                     className="satiro-input font-mono text-xs"
@@ -941,11 +949,13 @@ export const IntegrationsPage: React.FC = () => {
                   <label className="satiro-label">Permanent Access Token (System User Meta)</label>
                   <div className="relative">
                     <input
+                      name="meta_wa_permanent_token_system"
+                      autoComplete="new-password"
                       type={showSecrets.wa_access ? 'text' : 'password'}
                       value={waForm.access_token}
                       onChange={(e) => setWaForm({ ...waForm, access_token: e.target.value })}
                       className="satiro-input font-mono text-xs pr-9"
-                      placeholder="••••••••"
+                      placeholder="••••••••••••••••"
                     />
                     <button
                       type="button"

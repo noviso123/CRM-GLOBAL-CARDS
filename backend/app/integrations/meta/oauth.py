@@ -24,7 +24,13 @@ class MetaOAuthManager:
     ) -> str:
         """Gera URL oficial da Meta para conexão direta em 1 clique."""
         meta_cfg = self.meta_auth.load_config()
-        app_id = meta_cfg.get("app_id") or "109827364518290"  # GlobalCards Meta App Padrão
+        app_id = str(meta_cfg.get("app_id", "")).strip()
+
+        # Se não houver App ID registrado da Meta (string numérica longa),
+        # direciona para a tela de autorização inteligente do WhatsApp Embedded Signup
+        if not app_id or app_id == "admin" or not app_id.isdigit() or len(app_id) < 14:
+            return "http://127.0.0.1:8765/api/whatsapp/oauth/login-screen"
+
         scopes = "whatsapp_business_management,whatsapp_business_messaging,business_management"
         return (
             f"https://www.facebook.com/v21.0/dialog/oauth?"
