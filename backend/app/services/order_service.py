@@ -95,6 +95,16 @@ class OrderService:
             entidade="PEDIDOS",
             id_ref=order_rec["ID"],
         )
+
+        # Transmissão automática do pedido para o Bling ERP v3
+        try:
+            from app.integrations.bling.outbound import export_order_to_bling
+
+            export_order_to_bling(self.mgr, order_rec, saved_items)
+            order_rec = self.mgr.get_by_id("PEDIDOS", order_rec["ID"]) or order_rec
+        except Exception:
+            pass
+
         return self._enrich_order(order_rec, saved_items)
 
     def _enrich_order(
@@ -133,6 +143,15 @@ class OrderService:
             id_cliente=updated["ID_CLIENTE"],
             id_usuario=user_id,
         )
+
+        # Avança a situação do pedido no Bling ERP v3 automaticamente
+        try:
+            from app.integrations.bling.outbound import advance_order_status_in_bling
+
+            advance_order_status_in_bling(self.mgr, order_id, new_status.upper())
+        except Exception:
+            pass
+
         return self._enrich_order(updated)
 
     def list_orders(

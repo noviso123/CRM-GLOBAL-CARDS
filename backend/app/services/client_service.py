@@ -61,6 +61,16 @@ class ClientService:
             id_ref=rec["ID"],
         )
         write_audit_log("CREATE", "CLIENTES", rec["ID"], user_id)
+
+        # Sincronização automática ativa com o Bling ERP v3
+        try:
+            from app.integrations.bling.outbound import export_client_to_bling
+
+            export_client_to_bling(self.mgr, rec)
+            rec = self.mgr.get_by_id("CLIENTES", rec["ID"]) or rec
+        except Exception:
+            pass
+
         return rec
 
     def get_client(self, client_id: str) -> Dict[str, Any]:

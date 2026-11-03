@@ -53,6 +53,16 @@ class ProductService:
             f"Produto {rec['NOME']} ({rec['CODIGO']}) cadastrado a R$ {rec['PRECO']:.2f}.",
             id_usuario=user_id,
         )
+
+        # Sincronização automática ativa com o Bling ERP v3
+        try:
+            from app.integrations.bling.outbound import export_product_to_bling
+
+            export_product_to_bling(self.mgr, rec)
+            rec = self.mgr.get_by_id("PRODUTOS", rec["ID"]) or rec
+        except Exception:
+            pass
+
         return self._enrich_product(rec)
 
     def _enrich_product(self, rec: Dict[str, Any]) -> Dict[str, Any]:

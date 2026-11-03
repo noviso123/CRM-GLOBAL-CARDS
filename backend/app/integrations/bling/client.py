@@ -47,3 +47,68 @@ class BlingAPIClient:
                 )
             return resp.json()
 
+    def post(self, endpoint: str, json_data: Dict[str, Any]) -> Dict[str, Any]:
+        token = self._get_token()
+        url = f"{settings.bling_api_base_url}/{endpoint.lstrip('/')}"
+        with httpx.Client(timeout=25.0) as client:
+            resp = client.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                json=json_data,
+            )
+            if resp.status_code == 401:
+                new_token = self.auth.refresh_access_token()
+                if new_token:
+                    resp = client.post(
+                        url,
+                        headers={
+                            "Authorization": f"Bearer {new_token}",
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                        },
+                        json=json_data,
+                    )
+            if resp.status_code >= 400:
+                raise CRMSatiroException(
+                    f"Erro no envio de dados ao Bling ({endpoint}): HTTP {resp.status_code} - {resp.text}",
+                    error_code="BLING_API_ERROR",
+                )
+            return resp.json()
+
+    def patch(self, endpoint: str, json_data: Dict[str, Any]) -> Dict[str, Any]:
+        token = self._get_token()
+        url = f"{settings.bling_api_base_url}/{endpoint.lstrip('/')}"
+        with httpx.Client(timeout=25.0) as client:
+            resp = client.patch(
+                url,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                json=json_data,
+            )
+            if resp.status_code == 401:
+                new_token = self.auth.refresh_access_token()
+                if new_token:
+                    resp = client.patch(
+                        url,
+                        headers={
+                            "Authorization": f"Bearer {new_token}",
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                        },
+                        json=json_data,
+                    )
+            if resp.status_code >= 400:
+                raise CRMSatiroException(
+                    f"Erro na atualização de dados no Bling ({endpoint}): HTTP {resp.status_code} - {resp.text}",
+                    error_code="BLING_API_ERROR",
+                )
+            return resp.json()
+
+

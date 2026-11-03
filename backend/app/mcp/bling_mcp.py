@@ -246,3 +246,4 @@ class BlingMCPEngine:
                 "isError": True,
                 "content": [{"type": "text", "text": f"Ferramenta MCP '{tool_name}' não reconhecida."}],
             }
+
