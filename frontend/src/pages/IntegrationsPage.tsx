@@ -674,7 +674,7 @@ export const IntegrationsPage: React.FC = () => {
 
               {/* Filtro por Categoria */}
               <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl">
-                {['Todas', 'Bling ERP', 'WhatsApp & Meta', 'CRM Comercial', 'BI & Métricas'].map((cat) => (
+                {['Todas', 'Bling ERP', 'WhatsApp & Meta', 'Fornecedores Gráficos', 'CRM Comercial', 'BI & Métricas'].map((cat) => (
                   <button
                     key={cat}
                     type="button"

@@ -77,3 +77,4 @@ def import_supplier_product(
     """Importa produto diretamente para PRODUTOS.DBF do CRM e sincroniza automaticamente com o Bling."""
     check_permission(mgr, user, "PRODUTOS", "create")
     return SupplierService(mgr).import_product(payload.model_dump(), user_id=user["ID"])
+

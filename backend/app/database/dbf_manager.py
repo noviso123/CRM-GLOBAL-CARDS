@@ -141,7 +141,8 @@ class DBFManager:
                     rec = conn.read_record_at(pos)
                     if rec is not None and IndexManager.normalize_key(rec.get(fname)) == IndexManager.normalize_key(value):
                         results.append(rec)
-                return results
+                if results:
+                    return results
 
             target = IndexManager.normalize_key(value)
             return [
@@ -225,7 +226,7 @@ class DBFManager:
         with self.locks.table_lock(schema.name):
             conn.ensure_file_exists()
             stats = conn.pack()
-            active = conn.iter_active_records()
+            active = list(conn.iter_active_records())
             self.indexes.rebuild_table_index(schema, active)
             return stats
 

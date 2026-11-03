@@ -5,3 +5,4 @@ Suporte para:
 - FuturaIM (futuraim.com.br)
 - Padrão Color (padraocolor.com.br)
 """
+
