@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Eye,
   FolderPlus,
@@ -9,8 +9,10 @@ import {
   Search,
   Sparkles,
   Tag,
+  Truck,
   X,
 } from 'lucide-react';
+import { SupplierImportModal } from '../components/suppliers/SupplierImportModal';
 import { apiRequest } from '../services/api';
 import { CategoryRecord, PaginatedResponse, ProductRecord } from '../types/crm';
 
@@ -23,6 +25,7 @@ export const ProductsCatalogPage: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductRecord | null>(null);
   const [modalProductOpen, setModalProductOpen] = useState(false);
   const [modalCategoryOpen, setModalCategoryOpen] = useState(false);
+  const [modalSupplierOpen, setModalSupplierOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [catName, setCatName] = useState('');
@@ -129,7 +132,19 @@ export const ProductsCatalogPage: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setModalSupplierOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-md shadow-orange-500/20 border border-orange-400/30 transition-all hover:scale-[1.02]"
+            title="Importar produtos diretamente da Atual Card, Zap Gráfica, FuturaIM e Padrão Color"
+          >
+            <Truck className="w-4 h-4 text-white" />
+            <span>Importar de Fornecedores</span>
+            <span className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-black/20 text-[9px] uppercase font-bold tracking-wider">
+              4 Gráficas
+            </span>
+          </button>
           <button
             type="button"
             onClick={() => setModalCategoryOpen(true)}
@@ -140,9 +155,9 @@ export const ProductsCatalogPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setModalProductOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white text-[#053679] hover:bg-slate-100 text-xs font-bold shadow"
           >
-            <Plus className="w-4 h-4" /> Novo Produto
+            <Plus className="w-4 h-4" /> Novo Manual
           </button>
         </div>
       </div>
@@ -536,6 +551,15 @@ export const ProductsCatalogPage: React.FC = () => {
           </form>
         </div>
       )}
+
+      {/* Modal Central de Importação dos 4 Fornecedores Gráficos */}
+      <SupplierImportModal
+        isOpen={modalSupplierOpen}
+        onClose={() => setModalSupplierOpen(false)}
+        onImportSuccess={() => {
+          loadCatalog();
+        }}
+      />
     </div>
   );
 };

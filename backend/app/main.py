@@ -19,6 +19,7 @@ from app.api.routes import (
     reports,
     search,
     settings as settings_route,
+    suppliers,
     whatsapp,
 )
 from app.core.config import settings
@@ -93,6 +94,7 @@ def create_app(custom_data_dir: Optional[Path] = None) -> FastAPI:
     app.include_router(whatsapp.router)
     app.include_router(notifications.router)
     app.include_router(reports.router)
+    app.include_router(suppliers.router)
     app.include_router(integrations.router)
     app.include_router(settings_route.router)
     app.include_router(search.router)
