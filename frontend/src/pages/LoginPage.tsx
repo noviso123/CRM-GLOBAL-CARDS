@@ -47,18 +47,20 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#071E38] via-[#0F3D6E] to-[#0284C7] p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
-        <div className="bg-[#0F3D6E] px-8 py-7 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-sky-500 flex items-center justify-center font-extrabold text-base shadow">
-              GC
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">CRM GLOBAL CARDS</h1>
-              <p className="text-xs text-sky-200">
-                Plataforma Comercial Independente + Integração Bling
-              </p>
-            </div>
+        <div className="bg-white px-8 pt-7 pb-6 border-b border-slate-100 flex flex-col items-center justify-center text-center">
+          <div className="bg-white p-2 rounded-xl shadow-2xs border border-slate-100 mb-3 inline-flex items-center justify-center">
+            <img
+              src="/logo-globalcards.jpg"
+              alt="Global Cards"
+              className="h-10 w-auto object-contain"
+            />
           </div>
+          <h1 className="text-lg font-extrabold tracking-tight text-[#0F3D6E]">
+            CRM GLOBAL CARDS
+          </h1>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
+            Plataforma Comercial Independente + Integração Bling
+          </p>
         </div>
 
         <div className="p-8">

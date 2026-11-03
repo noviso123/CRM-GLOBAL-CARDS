@@ -138,17 +138,21 @@ export const MainLayout: React.FC = () => {
           collapsed ? 'w-20' : 'w-64'
         } bg-[#0F3D6E] text-white flex flex-col transition-all duration-200 shrink-0 shadow-xl z-20`}
       >
-        <div className="h-16 px-4 flex items-center justify-between border-b border-white/10">
+        <div className="h-16 px-4 flex items-center justify-between border-b border-white/10 bg-[#0C325B]">
           {!collapsed && (
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-sm shadow-inner">
-                GC
+            <Link to="/" className="flex items-center gap-2.5 overflow-hidden">
+              <div className="bg-white rounded-lg p-1 shrink-0 shadow-sm flex items-center justify-center">
+                <img
+                  src="/logo-globalcards.jpg"
+                  alt="Global Cards"
+                  className="h-7 w-auto object-contain"
+                />
               </div>
-              <div>
-                <span className="font-bold tracking-tight text-sm block leading-none">
+              <div className="truncate">
+                <span className="font-extrabold tracking-tight text-xs block leading-tight text-white">
                   CRM GLOBAL CARDS
                 </span>
-                <span className="text-[11px] text-sky-200 block mt-0.5">
+                <span className="text-[10px] text-sky-200 block truncate">
                   Gestão Comercial + Bling
                 </span>
               </div>
@@ -157,9 +161,14 @@ export const MainLayout: React.FC = () => {
           {collapsed && (
             <Link
               to="/"
-              className="w-9 h-9 mx-auto rounded-lg bg-sky-500 flex items-center justify-center font-bold text-sm"
+              className="bg-white p-1 mx-auto rounded-lg shadow-sm flex items-center justify-center"
+              title="CRM GLOBAL CARDS"
             >
-              GC
+              <img
+                src="/logo-globalcards.jpg"
+                alt="GC"
+                className="h-6 w-6 object-contain"
+              />
             </Link>
           )}
           <button

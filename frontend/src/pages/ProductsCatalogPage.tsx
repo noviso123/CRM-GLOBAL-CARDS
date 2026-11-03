@@ -111,14 +111,23 @@ export const ProductsCatalogPage: React.FC = () => {
     <div className="space-y-6">
       {/* Banner Comercial Estilo Loja B2B / Globalcards */}
       <div className="rounded-2xl bg-gradient-to-r from-[#0F3D6E] via-[#0B2D52] to-[#0284C7] text-white p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-sky-200 text-[11px] font-semibold mb-2">
-            <Sparkles className="w-3.5 h-3.5" /> Catálogo Comercial B2B & Integração Bling
-          </span>
-          <h1 className="text-2xl font-bold tracking-tight">Catálogo de Produtos e Suprimentos</h1>
-          <p className="text-xs text-sky-100/90 mt-1 max-w-2xl">
-            Organização visual por categorias, consulta rápida de preços, saldos de estoque e ficha técnica comercial para montagem de orçamentos e pedidos.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="bg-white p-2 rounded-xl shadow-md hidden sm:flex items-center justify-center shrink-0">
+            <img
+              src="/logo-globalcards.jpg"
+              alt="Global Cards"
+              className="h-9 w-auto object-contain"
+            />
+          </div>
+          <div>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-sky-200 text-[11px] font-semibold mb-1">
+              <Sparkles className="w-3.5 h-3.5" /> Catálogo Comercial B2B & Integração Bling
+            </span>
+            <h1 className="text-2xl font-bold tracking-tight">Catálogo de Produtos e Suprimentos</h1>
+            <p className="text-xs text-sky-100/90 mt-0.5 max-w-2xl">
+              Organização visual por categorias, consulta rápida de preços, saldos de estoque e ficha técnica comercial para montagem de orçamentos e pedidos.
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
           <button
