@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -157,7 +157,7 @@ export const DashboardPage: React.FC = () => {
               onClick={() => setPeriod(d)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
                 period === d
-                  ? 'bg-[#0F3D6E] text-white border-[#0F3D6E]'
+                  ? 'bg-[#053679] text-white border-[#053679]'
                   : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -431,4 +431,5 @@ export const DashboardPage: React.FC = () => {
     </div>
   );
 };
+
 

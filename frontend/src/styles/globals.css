@@ -3,17 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #0f3d6e;
-  --color-primary-hover: #0b2d52;
-  --color-accent: #0284c7;
-  --color-highlight: #ea580c;
+  --color-primary: #053679; /* Azul Oficial Global Cards */
+  --color-primary-hover: #042a5f;
+  --color-secondary: #ed6706; /* Laranja Oficial Global Cards */
+  --color-secondary-hover: #c24f04;
+  --color-accent: #053679;
+  --color-highlight: #ed6706;
   --color-bg-app: #f8fafc;
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
   --color-text-main: #0f172a;
   --color-text-muted: #475569;
   --color-success: #16a34a;
-  --color-warning: #d97706;
+  --color-warning: #ed6706;
   --color-danger: #dc2626;
 }
 
@@ -24,10 +26,16 @@
     @apply bg-white rounded-xl border border-slate-200 shadow-sm transition-all;
   }
 
-  /* Botão Primário Corporativo */
+  /* Botão Primário Corporativo - Azul Oficial Global Cards */
   .satiro-btn-primary,
   .gc-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#0F3D6E] hover:bg-[#0B2D52] text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#053679] hover:bg-[#042A5F] text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  /* Botão Destaque Comercial - Laranja Oficial Global Cards */
+  .gc-btn-orange,
+  .gc-btn-accent {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#ED6706] hover:bg-[#C24F04] text-white text-xs font-bold shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
 
   /* Botão Secundário Elegante com Fundo Branco e Borda */
@@ -39,7 +47,7 @@
   /* Inputs Padronizados com Altura, Borda e Foco Perfeito */
   .satiro-input,
   .gc-input {
-    @apply w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-600 transition;
+    @apply w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#053679]/20 focus:border-[#053679] transition;
   }
 
   /* Rótulos de Campos */

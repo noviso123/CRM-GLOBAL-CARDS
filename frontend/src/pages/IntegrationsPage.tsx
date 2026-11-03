@@ -203,7 +203,7 @@ export const IntegrationsPage: React.FC = () => {
       </div>
 
       {/* Banner de Integração Facilitada em 1 Clique */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#071E38] via-[#0F3D6E] to-[#0284C7] p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="rounded-2xl bg-gradient-to-r from-[#031E44] via-[#053679] to-[#042A5F] p-6 text-white shadow-xl relative overflow-hidden border border-white/10">
         <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-white/5 rounded-full pointer-events-none" />
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
@@ -565,3 +565,4 @@ export const IntegrationsPage: React.FC = () => {
     </div>
   );
 };
+

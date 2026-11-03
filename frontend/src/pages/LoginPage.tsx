@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -45,7 +45,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#071E38] via-[#0F3D6E] to-[#0284C7] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#031E44] via-[#053679] to-[#042A5F] p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
         <div className="bg-white px-8 pt-7 pb-6 border-b border-slate-100 flex flex-col items-center justify-center text-center">
           <div className="bg-white p-2 rounded-xl shadow-2xs border border-slate-100 mb-3 inline-flex items-center justify-center">
@@ -55,7 +55,7 @@ export const LoginPage: React.FC = () => {
               className="h-10 w-auto object-contain"
             />
           </div>
-          <h1 className="text-lg font-extrabold tracking-tight text-[#0F3D6E]">
+          <h1 className="text-lg font-extrabold tracking-tight text-[#053679]">
             CRM GLOBAL CARDS
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -124,7 +124,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 px-4 rounded-lg bg-[#0F3D6E] hover:bg-[#0B2D52] text-white font-semibold text-sm transition shadow-md disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-lg bg-[#ED6706] hover:bg-[#C24F04] text-white font-bold text-sm transition shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {submitting ? 'Autenticando...' : 'Entrar no CRM GLOBAL CARDS'}
               </button>
@@ -133,7 +133,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRecoverMode(true)}
-                  className="text-sky-700 hover:underline font-medium"
+                  className="text-[#053679] hover:underline font-bold"
                 >
                   Recuperar senha
                 </button>
@@ -186,4 +186,5 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
 

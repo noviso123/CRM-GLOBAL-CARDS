@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Plus, Search, Trash2, UserCheck, X } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { ClientRecord, ContactRecord, PaginatedResponse } from '../types/crm';
@@ -91,7 +91,7 @@ export const ContactsPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F3D6E] text-white text-xs font-semibold"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#053679] text-white text-xs font-semibold"
         >
           <Plus className="w-4 h-4" /> Novo Contato
         </button>
@@ -269,7 +269,7 @@ export const ContactsPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                  className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
                 >
                   Salvar Contato
                 </button>
@@ -281,4 +281,5 @@ export const ContactsPage: React.FC = () => {
     </div>
   );
 };
+
 

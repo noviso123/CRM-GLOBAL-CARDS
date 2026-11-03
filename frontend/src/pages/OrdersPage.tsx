@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Eye, Plus, Search, ShoppingCart, Trash2, X } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import {
@@ -120,7 +120,7 @@ export const OrdersPage: React.FC = () => {
             setModalOpen(true);
             if (items.length === 0 && products.length > 0) addItemRow();
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F3D6E] hover:bg-[#0B2D52] text-white text-xs font-semibold shadow-sm transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#053679] hover:bg-[#042A5F] text-white text-xs font-semibold shadow-sm transition-colors"
         >
           <Plus className="w-4 h-4" /> Novo Pedido
         </button>
@@ -249,7 +249,7 @@ export const OrdersPage: React.FC = () => {
                   onClick={() => void handleStatusChange(detailOrder.ID, st)}
                   className={`px-2.5 py-1 rounded-lg font-bold text-[11px] ${
                     detailOrder.SITUACAO === st
-                      ? 'bg-[#0F3D6E] text-white'
+                      ? 'bg-[#053679] text-white'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -475,7 +475,7 @@ export const OrdersPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Emitir Pedido
               </button>
@@ -486,4 +486,5 @@ export const OrdersPage: React.FC = () => {
     </div>
   );
 };
+
 

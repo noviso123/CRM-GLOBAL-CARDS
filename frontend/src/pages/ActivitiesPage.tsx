@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Calendar, CheckCircle2, Clock, List, Plus, X, XCircle } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import { ActivityRecord, ClientRecord, PaginatedResponse } from '../types/crm';
@@ -96,7 +96,7 @@ export const ActivitiesPage: React.FC = () => {
               type="button"
               onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 text-xs font-semibold flex items-center gap-1 ${
-                viewMode === 'list' ? 'bg-[#0F3D6E] text-white' : 'text-slate-600'
+                viewMode === 'list' ? 'bg-[#053679] text-white' : 'text-slate-600'
               }`}
             >
               <List className="w-3.5 h-3.5" /> Lista
@@ -105,7 +105,7 @@ export const ActivitiesPage: React.FC = () => {
               type="button"
               onClick={() => setViewMode('calendar')}
               className={`px-3 py-1.5 text-xs font-semibold flex items-center gap-1 ${
-                viewMode === 'calendar' ? 'bg-[#0F3D6E] text-white' : 'text-slate-600'
+                viewMode === 'calendar' ? 'bg-[#053679] text-white' : 'text-slate-600'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" /> Calendário
@@ -114,7 +114,7 @@ export const ActivitiesPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0F3D6E] text-white text-xs font-semibold"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#053679] text-white text-xs font-semibold"
           >
             <Plus className="w-4 h-4" /> Nova Atividade
           </button>
@@ -135,7 +135,7 @@ export const ActivitiesPage: React.FC = () => {
             onClick={() => setSituacaoFilter(st)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
               situacaoFilter === st
-                ? 'bg-[#0F3D6E] text-white border-[#0F3D6E]'
+                ? 'bg-[#053679] text-white border-[#053679]'
                 : 'bg-white text-slate-600 border-slate-200'
             }`}
           >
@@ -214,7 +214,7 @@ export const ActivitiesPage: React.FC = () => {
               key={dateKey}
               className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-2"
             >
-              <div className="flex items-center gap-2 font-mono text-xs font-bold text-[#0F3D6E] border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2 font-mono text-xs font-bold text-[#053679] border-b border-slate-100 pb-2">
                 <Clock className="w-4 h-4" /> {dateKey}
               </div>
               {list.map((a) => (
@@ -339,7 +339,7 @@ export const ActivitiesPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Agendar
               </button>
@@ -350,4 +350,5 @@ export const ActivitiesPage: React.FC = () => {
     </div>
   );
 };
+
 

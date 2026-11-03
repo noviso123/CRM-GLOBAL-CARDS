@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   Eye,
   FolderPlus,
@@ -110,7 +110,7 @@ export const ProductsCatalogPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Banner Comercial Estilo Loja B2B / Globalcards */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#0F3D6E] via-[#0B2D52] to-[#0284C7] text-white p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="rounded-2xl bg-gradient-to-r from-[#053679] via-[#042A5F] to-[#0284C7] text-white p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="bg-white p-2 rounded-xl shadow-md hidden sm:flex items-center justify-center shrink-0">
             <img
@@ -166,7 +166,7 @@ export const ProductsCatalogPage: React.FC = () => {
               onClick={() => setSelectedCategory('')}
               className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition ${
                 selectedCategory === ''
-                  ? 'bg-[#0F3D6E] text-white'
+                  ? 'bg-[#053679] text-white'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -179,7 +179,7 @@ export const ProductsCatalogPage: React.FC = () => {
                 onClick={() => setSelectedCategory(cat.ID)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition ${
                   selectedCategory === cat.ID
-                    ? 'bg-[#0F3D6E] text-white font-semibold'
+                    ? 'bg-[#053679] text-white font-semibold'
                     : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
@@ -207,7 +207,7 @@ export const ProductsCatalogPage: React.FC = () => {
                 type="button"
                 onClick={() => setViewMode('cards')}
                 className={`p-2 ${
-                  viewMode === 'cards' ? 'bg-[#0F3D6E] text-white' : 'bg-white text-slate-600'
+                  viewMode === 'cards' ? 'bg-[#053679] text-white' : 'bg-white text-slate-600'
                 }`}
                 title="Visualização em Cards"
               >
@@ -217,7 +217,7 @@ export const ProductsCatalogPage: React.FC = () => {
                 type="button"
                 onClick={() => setViewMode('list')}
                 className={`p-2 ${
-                  viewMode === 'list' ? 'bg-[#0F3D6E] text-white' : 'bg-white text-slate-600'
+                  viewMode === 'list' ? 'bg-[#053679] text-white' : 'bg-white text-slate-600'
                 }`}
                 title="Visualização em Lista"
               >
@@ -265,7 +265,7 @@ export const ProductsCatalogPage: React.FC = () => {
                   <div className="px-4 pb-4 pt-2 border-t border-slate-100 flex items-end justify-between">
                     <div>
                       <span className="text-[10px] text-slate-400 block">Preço Unitário ({p.UNIDADE})</span>
-                      <span className="text-lg font-extrabold text-[#0F3D6E] tabular-nums">
+                      <span className="text-lg font-extrabold text-[#053679] tabular-nums">
                         R$ {p.PRECO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                       <span className="block text-[11px] text-slate-500">
@@ -275,7 +275,7 @@ export const ProductsCatalogPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedProduct(p)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200/80 text-sky-700 hover:bg-[#0F3D6E] hover:text-white hover:border-[#0F3D6E] text-xs font-semibold transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200/80 text-sky-700 hover:bg-[#053679] hover:text-white hover:border-[#053679] text-xs font-semibold transition-colors shadow-2xs"
                     >
                       <Eye className="w-3.5 h-3.5" /> Detalhes
                     </button>
@@ -352,7 +352,7 @@ export const ProductsCatalogPage: React.FC = () => {
             <div className="grid grid-cols-3 gap-3 text-xs">
               <div className="p-3 rounded-lg bg-slate-50">
                 <span className="text-slate-400 block">Preço Comercial</span>
-                <strong className="text-base text-[#0F3D6E]">
+                <strong className="text-base text-[#053679]">
                   R$ {selectedProduct.PRECO.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </strong>
               </div>
@@ -422,7 +422,7 @@ export const ProductsCatalogPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-4 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Criar Categoria
               </button>
@@ -528,7 +528,7 @@ export const ProductsCatalogPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Salvar Produto
               </button>
@@ -539,4 +539,5 @@ export const ProductsCatalogPage: React.FC = () => {
     </div>
   );
 };
+
 

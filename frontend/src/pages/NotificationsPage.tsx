@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Bell, Check, CheckCheck } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import type { NotificationRecord } from '../types/crm';
@@ -98,4 +98,5 @@ export const NotificationsPage: React.FC = () => {
     </div>
   );
 };
+
 

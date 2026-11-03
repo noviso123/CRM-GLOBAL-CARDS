@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Bot, Sparkles, Send, ShieldCheck, Wrench } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import type { ClientRecord, PaginatedResponse } from '../types/crm';
@@ -189,3 +189,4 @@ export const AIAssistantPage: React.FC = () => {
     </div>
   );
 };
+

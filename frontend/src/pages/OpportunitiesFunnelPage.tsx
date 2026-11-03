@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Briefcase, Kanban, List, Plus, Settings2, X } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import {
@@ -138,7 +138,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
               type="button"
               onClick={() => setViewMode('kanban')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-                viewMode === 'kanban' ? 'bg-[#0F3D6E] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                viewMode === 'kanban' ? 'bg-[#053679] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Kanban className="w-3.5 h-3.5" /> Kanban
@@ -147,7 +147,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
               type="button"
               onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all ${
-                viewMode === 'list' ? 'bg-[#0F3D6E] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                viewMode === 'list' ? 'bg-[#053679] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <List className="w-3.5 h-3.5" /> Lista
@@ -163,7 +163,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0F3D6E] hover:bg-[#0B2D52] text-white text-xs font-semibold shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#053679] hover:bg-[#042A5F] text-white text-xs font-semibold shadow-sm transition-colors"
           >
             <Plus className="w-4 h-4" /> Nova Oportunidade
           </button>
@@ -229,7 +229,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
                         {op.CLIENTE_NOME || 'Cliente'}
                       </p>
                       <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                        <span className="font-mono text-xs font-extrabold text-[#0F3D6E]">
+                        <span className="font-mono text-xs font-extrabold text-[#053679]">
                           R$ {op.VALOR_EST.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                         <select
@@ -374,7 +374,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Criar Oportunidade
               </button>
@@ -432,7 +432,7 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-4 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Adicionar Etapa
               </button>
@@ -443,4 +443,5 @@ export const OpportunitiesFunnelPage: React.FC<{ defaultView?: 'kanban' | 'list'
     </div>
   );
 };
+
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   Building2,
   Download,
@@ -193,7 +193,7 @@ export const ClientsPage: React.FC = () => {
               setForm(INITIAL_FORM);
               setModalOpen(true);
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F3D6E] hover:bg-[#0B2D52] text-white text-xs font-semibold shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#053679] hover:bg-[#042A5F] text-white text-xs font-semibold shadow-sm"
           >
             <Plus className="w-4 h-4" /> Novo Cliente
           </button>
@@ -328,7 +328,7 @@ export const ClientsPage: React.FC = () => {
       {overview && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div className="px-6 py-4 bg-[#0F3D6E] text-white flex items-center justify-between">
+            <div className="px-6 py-4 bg-[#053679] text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Building2 className="w-6 h-6 text-sky-300" />
                 <div>
@@ -502,7 +502,7 @@ export const ClientsPage: React.FC = () => {
                     />
                     <button
                       type="submit"
-                      className="px-4 py-1.5 rounded bg-[#0F3D6E] text-white font-semibold"
+                      className="px-4 py-1.5 rounded bg-[#053679] text-white font-semibold"
                     >
                       + Adicionar Endereço
                     </button>
@@ -837,7 +837,7 @@ export const ClientsPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                  className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
                 >
                   Salvar Cliente
                 </button>
@@ -849,4 +849,5 @@ export const ClientsPage: React.FC = () => {
     </div>
   );
 };
+
 

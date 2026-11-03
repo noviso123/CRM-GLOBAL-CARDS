@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRightCircle, CheckCircle, FileText, Plus, Trash2, X, XCircle } from 'lucide-react';
 import { apiRequest } from '../services/api';
 import {
@@ -127,7 +127,7 @@ export const QuotationsPage: React.FC = () => {
             setModalOpen(true);
             if (items.length === 0 && products.length > 0) addItem();
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F3D6E] text-white text-xs font-semibold"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#053679] text-white text-xs font-semibold"
         >
           <Plus className="w-4 h-4" /> Novo Orçamento
         </button>
@@ -161,7 +161,7 @@ export const QuotationsPage: React.FC = () => {
             onClick={() => setSituacaoFilter(st)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               situacaoFilter === st
-                ? 'bg-[#0F3D6E] text-white shadow-sm'
+                ? 'bg-[#053679] text-white shadow-sm'
                 : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200/60 hover:bg-white/90'
             }`}
           >
@@ -404,7 +404,7 @@ export const QuotationsPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-lg bg-[#0F3D6E] text-white font-semibold"
+                className="px-5 py-2 rounded-lg bg-[#053679] text-white font-semibold"
               >
                 Salvar Orçamento
               </button>
@@ -415,4 +415,5 @@ export const QuotationsPage: React.FC = () => {
     </div>
   );
 };
+
 

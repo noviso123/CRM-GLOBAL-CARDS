@@ -136,9 +136,9 @@ export const MainLayout: React.FC = () => {
       <aside
         className={`${
           collapsed ? 'w-20' : 'w-64'
-        } bg-[#0F3D6E] text-white flex flex-col transition-all duration-200 shrink-0 shadow-xl z-20`}
+        } bg-[#053679] text-white flex flex-col transition-all duration-200 shrink-0 shadow-xl z-20`}
       >
-        <div className="h-16 px-4 flex items-center justify-between border-b border-white/10 bg-[#0C325B]">
+        <div className="h-16 px-4 flex items-center justify-between border-b border-white/10 bg-[#03224C]">
           {!collapsed && (
             <Link to="/" className="flex items-center gap-2.5 overflow-hidden">
               <div className="bg-white rounded-lg p-1 shrink-0 shadow-sm flex items-center justify-center">
@@ -152,7 +152,7 @@ export const MainLayout: React.FC = () => {
                 <span className="font-extrabold tracking-tight text-xs block leading-tight text-white">
                   CRM GLOBAL CARDS
                 </span>
-                <span className="text-[10px] text-sky-200 block truncate">
+                <span className="text-[10px] text-blue-200 block truncate">
                   Gestão Comercial + Bling
                 </span>
               </div>
@@ -175,7 +175,7 @@ export const MainLayout: React.FC = () => {
             type="button"
             onClick={() => setCollapsed((c) => !c)}
             title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-            className="p-1.5 rounded-md hover:bg-white/10 text-sky-100"
+            className="p-1.5 rounded-md hover:bg-white/10 text-blue-100"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -188,7 +188,7 @@ export const MainLayout: React.FC = () => {
             return (
               <div key={group.title}>
                 {!collapsed && (
-                  <div className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-sky-200/70">
+                  <div className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-blue-200/70">
                     {group.title}
                   </div>
                 )}
@@ -203,8 +203,8 @@ export const MainLayout: React.FC = () => {
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             isActive
-                              ? 'bg-sky-500 text-white shadow-sm'
-                              : 'text-sky-100/85 hover:bg-white/10 hover:text-white'
+                              ? 'bg-[#ED6706] text-white font-bold shadow-sm'
+                              : 'text-blue-100/90 hover:bg-white/10 hover:text-white'
                           }`
                         }
                         title={collapsed ? item.label : undefined}
@@ -212,7 +212,7 @@ export const MainLayout: React.FC = () => {
                         <Icon className="w-4 h-4 shrink-0" />
                         {!collapsed && <span className="truncate">{item.label}</span>}
                         {!collapsed && item.path === '/notificacoes' && unreadCount > 0 && (
-                          <span className="ml-auto bg-amber-500 text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full">
+                          <span className="ml-auto bg-[#ED6706] text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full shadow-2xs">
                             {unreadCount}
                           </span>
                         )}
@@ -225,7 +225,7 @@ export const MainLayout: React.FC = () => {
           })}
         </nav>
 
-        <div className="p-3 border-t border-white/10 bg-[#0B2D52]">
+        <div className="p-3 border-t border-white/10 bg-[#03224C]">
           {!collapsed ? (
             <div className="flex items-center justify-between">
               <div className="truncate">
@@ -390,7 +390,7 @@ export const MainLayout: React.FC = () => {
               to="/configuracoes"
               className="flex items-center gap-2 pl-3 border-l border-slate-200 text-xs font-medium text-slate-700 hover:text-sky-700"
             >
-              <div className="w-8 h-8 rounded-full bg-[#0F3D6E] text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-full bg-[#053679] text-white ring-2 ring-[#ED6706]/40 flex items-center justify-center font-bold">
                 {user?.NOME?.charAt(0) || 'U'}
               </div>
               <div className="hidden sm:block text-left">

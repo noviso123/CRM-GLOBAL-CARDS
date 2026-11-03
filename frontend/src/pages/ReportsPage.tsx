@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { BarChart3, Download, Filter } from 'lucide-react';
 import { apiRequest, downloadAuthorizedCsv } from '../services/api';
 
@@ -147,4 +147,5 @@ export const ReportsPage: React.FC = () => {
     </div>
   );
 };
+
 
