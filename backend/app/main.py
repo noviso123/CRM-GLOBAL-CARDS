@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -75,6 +75,11 @@ def create_app(custom_data_dir: Optional[Path] = None) -> FastAPI:
             "storage": "DBF/dBase III+ Local",
             "sql_used": False,
         }
+
+    @app.post("/api/mcp")
+    def mcp_root_endpoint(payload: Dict[str, Any]):
+        from app.mcp.bling_mcp import BlingMCPEngine
+        return BlingMCPEngine(mgr).handle_jsonrpc(payload)
 
     app.include_router(auth.router)
     app.include_router(dashboard.router)

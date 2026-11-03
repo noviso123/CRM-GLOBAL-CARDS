@@ -36,9 +36,10 @@ export const IntegrationsPage: React.FC = () => {
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
 
   // Estado do MCP
-  const [mcpTools, setMcpTools] = useState<Array<{ name: string; description: string; inputSchema?: any }>>([]);
+  const [mcpTools, setMcpTools] = useState<Array<{ name: string; description: string; category?: string; inputSchema?: any }>>([]);
   const [mcpResult, setMcpResult] = useState<any>(null);
   const [mcpLoading, setMcpLoading] = useState(false);
+  const [mcpCategory, setMcpCategory] = useState<string>('Todas');
 
   // Estado do WhatsApp & Meta
   const [waAccount, setWaAccount] = useState<any>(null);
@@ -52,6 +53,30 @@ export const IntegrationsPage: React.FC = () => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const handleFullSync = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const res = await apiRequest<{
+        status: string;
+        message: string;
+        inbound_from_bling: any;
+        outbound_to_bling: any;
+        cross_channel_whatsapp: any;
+        total_records_processed: number;
+      }>('/integrations/full-sync-omnidirectional', { method: 'POST' });
+
+      setSyncResult(
+        `🎉 Sincronização 100% Total Concluída (${res.total_records_processed} registros): Bling ➔ CRM (${res.inbound_from_bling?.products || 0} prod, ${res.inbound_from_bling?.contacts || 0} cli, ${res.inbound_from_bling?.orders || 0} ped) | CRM ➔ Bling (${res.outbound_to_bling?.products_exported || 0} prod, ${res.outbound_to_bling?.clients_exported || 0} cli, ${res.outbound_to_bling?.orders_exported || 0} ped) | WhatsApp (${res.cross_channel_whatsapp?.conversations_linked || 0} conversas vinculadas).`
+      );
+      await loadStatus();
+    } catch (err) {
+      setSyncResult(err instanceof Error ? err.message : 'Erro na sincronização bidirecional');
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const toggleSecret = (field: string) => {
@@ -401,16 +426,17 @@ export const IntegrationsPage: React.FC = () => {
                   className="px-6 py-3.5 rounded-xl bg-[#ED6706] hover:bg-[#C24F04] text-white font-black text-sm shadow-lg hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Conectar com Bling (Login Direto)
+                  Conectar com Bling
                 </button>
                 <button
                   type="button"
                   disabled={syncing}
-                  onClick={handleAutoImportAll}
-                  className="px-5 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-white/25 backdrop-blur-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  onClick={handleFullSync}
+                  className="px-5 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                  title="Sincroniza 100% dos dados em ambos os sentidos (Bling, CRM e WhatsApp)"
                 >
-                  <ArrowDownToLine className={`w-4 h-4 ${syncing ? 'animate-bounce' : ''}`} />
-                  {syncing ? 'Baixando Dados...' : 'Importar Tudo do Bling Agora'}
+                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  {syncing ? 'Sincronizando...' : '⚡ Sincronizar Tudo (100% Bidirecional)'}
                 </button>
               </div>
             </div>
@@ -619,25 +645,48 @@ export const IntegrationsPage: React.FC = () => {
 
           {/* Catálogo de Ferramentas MCP Prontas */}
           <div className="gc-card p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                   <Layers className="w-5 h-5 text-[#053679]" /> Ferramentas MCP Disponíveis ({mcpTools.length})
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Clique em &ldquo;Testar Ferramenta&rdquo; para executar a tool do protocolo em tempo real.
+                  Execute ferramentas autônomas do protocolo MCP diretamente ou conecte agentes externos.
                 </p>
+              </div>
+
+              {/* Filtro por Categoria */}
+              <div className="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl">
+                {['Todas', 'Bling ERP', 'WhatsApp & Meta', 'CRM Comercial', 'BI & Métricas'].map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setMcpCategory(cat)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                      mcpCategory === cat
+                        ? 'bg-[#053679] text-white shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mcpTools.map((t) => (
+              {(mcpCategory === 'Todas' ? mcpTools : mcpTools.filter((t) => t.category === mcpCategory)).map((t) => (
                 <div key={t.name} className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-3 flex flex-col justify-between hover:border-sky-300 transition-colors">
                   <div>
-                    <span className="font-mono text-xs font-black text-[#053679] block">
-                      {t.name}
-                    </span>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-3 leading-relaxed">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="font-mono text-xs font-black text-[#053679] truncate">
+                        {t.name}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-blue-100/70 text-[#053679] text-[10px] font-bold shrink-0">
+                        {t.category || 'Geral'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
                       {t.description}
                     </p>
                   </div>
@@ -651,6 +700,41 @@ export const IntegrationsPage: React.FC = () => {
                   </button>
                 </div>
               ))}
+            </div>
+
+            {/* Configuração MCP para Claude Desktop & Cursor */}
+            <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Cpu className="w-4 h-4 text-[#ED6706]" /> Conectar Claude Desktop, Cursor ou Agentes Externos
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Endpoint JSON-RPC 2.0 padrão ativo em: <code className="font-mono text-slate-800 font-bold">http://127.0.0.1:8765/api/integrations/mcp/rpc</code>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  copyToClipboard(
+                    JSON.stringify(
+                      {
+                        mcpServers: {
+                          'crm-globalcards': {
+                            url: 'http://127.0.0.1:8765/api/integrations/mcp/rpc',
+                          },
+                        },
+                      },
+                      null,
+                      2
+                    ),
+                    'mcp_config'
+                  )
+                }
+                className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1.5 shrink-0"
+              >
+                {copiedKey === 'mcp_config' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                Copiar Configuração MCP
+              </button>
             </div>
 
             {/* Terminal de Resposta da Execução MCP */}

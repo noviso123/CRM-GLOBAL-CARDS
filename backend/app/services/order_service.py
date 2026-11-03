@@ -105,6 +105,25 @@ class OrderService:
         except Exception:
             pass
 
+        # Disparo automático de notificação no WhatsApp
+        try:
+            if client:
+                tel = str(client.get("CELULAR") or client.get("TELEFONE") or "")
+                if tel:
+                    from app.integrations.whatsapp.client import WhatsAppCloudClient
+
+                    WhatsAppCloudClient(self.mgr).send_cloud_template_message(
+                        to_phone=tel,
+                        template_name="confirmacao_pedido",
+                        parameters=[
+                            client.get("NOME", "Cliente"),
+                            order_rec.get("NUMERO", ""),
+                            f"{total_final:.2f}",
+                        ],
+                    )
+        except Exception:
+            pass
+
         return self._enrich_order(order_rec, saved_items)
 
     def _enrich_order(
@@ -149,6 +168,34 @@ class OrderService:
             from app.integrations.bling.outbound import advance_order_status_in_bling
 
             advance_order_status_in_bling(self.mgr, order_id, new_status.upper())
+        except Exception:
+            pass
+
+        # Notificação automática via WhatsApp para o cliente sobre a mudança de situação
+        try:
+            cli = self.mgr.get_by_id("CLIENTES", updated.get("ID_CLIENTE", ""))
+            if cli:
+                tel = str(cli.get("CELULAR") or cli.get("TELEFONE") or "")
+                if tel:
+                    from app.integrations.whatsapp.client import WhatsAppCloudClient
+
+                    wa = WhatsAppCloudClient(self.mgr)
+                    if new_status.upper() == "FATURADO":
+                        wa.send_cloud_template_message(
+                            to_phone=tel,
+                            template_name="pedido_faturado",
+                            parameters=[cli.get("NOME", "Cliente"), updated.get("NUMERO", "")],
+                        )
+                    elif new_status.upper() == "APROVADO":
+                        wa.send_cloud_template_message(
+                            to_phone=tel,
+                            template_name="confirmacao_pedido",
+                            parameters=[
+                                cli.get("NOME", "Cliente"),
+                                updated.get("NUMERO", ""),
+                                f"{float(updated.get('TOTAL', 0)):.2f}",
+                            ],
+                        )
         except Exception:
             pass
 

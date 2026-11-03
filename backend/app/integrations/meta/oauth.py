@@ -128,3 +128,4 @@ class MetaOAuthManager:
             "webhook_url": f"http://{settings.host}:{settings.port}/api/whatsapp/webhook",
             "webhook_verify_token": "globalcards_wa_verify",
         }
+

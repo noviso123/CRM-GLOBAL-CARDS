@@ -124,6 +124,17 @@ class BlingSyncService:
                 "DT_ULT_INT": now_iso(),
             },
         )
+
+        # Cruzamento automático com WhatsApp: vincula conversas existentes
+        phone_digits = normalize_digits(created.get("CELULAR", "")) or normalize_digits(created.get("TELEFONE", ""))
+        if phone_digits and len(phone_digits) >= 8:
+            convs = self.mgr.find_all("CONVERS")
+            for conv in convs:
+                if not conv.get("ID_CLIENTE"):
+                    c_tel = normalize_digits(conv.get("TELEFONE", ""))
+                    if c_tel and (c_tel.endswith(phone_digits[-8:]) or phone_digits.endswith(c_tel[-8:])):
+                        self.mgr.update("CONVERS", conv["ID"], {"ID_CLIENTE": created["ID"]})
+
         return {"action": "CREATED", "record": created}
 
     def upsert_bling_order(self, b_order: Dict[str, Any]) -> Dict[str, Any]:
@@ -169,6 +180,22 @@ class BlingSyncService:
                 "ID_EXT": ext_id,
             },
         )
+
+        # Disparo automático de WhatsApp para o cliente notificando o pedido
+        try:
+            cli = self.mgr.get_by_id("CLIENTES", client_id)
+            if cli:
+                tel = normalize_digits(cli.get("CELULAR", "")) or normalize_digits(cli.get("TELEFONE", ""))
+                if tel:
+                    from app.integrations.whatsapp.client import WhatsAppCloudClient
+                    WhatsAppCloudClient(self.mgr).send_cloud_template_message(
+                        to_phone=tel,
+                        template_name="confirmacao_pedido",
+                        parameters=[cli.get("NOME", "Cliente"), numero, f"{total:.2f}"],
+                    )
+        except Exception:
+            pass
+
         return {"action": "CREATED", "record": created}
 
     def run_sync(self, scopes: List[str]) -> Dict[str, Any]:

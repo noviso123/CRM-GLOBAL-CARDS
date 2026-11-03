@@ -309,11 +309,15 @@ def get_mcp_tools(
     from app.mcp.bling_mcp import BlingMCPEngine
 
     engine = BlingMCPEngine(mgr)
+    tools = engine.get_tool_definitions()
+    categories = sorted(list(set(t.get("category", "Geral") for t in tools)))
     return {
         "server": "Bling-GlobalCards-MCP",
         "version": "1.0.0",
         "protocol": "2024-11-05",
-        "tools": engine.get_tool_definitions(),
+        "total_tools": len(tools),
+        "categories": categories,
+        "tools": tools,
     }
 
 
@@ -328,6 +332,75 @@ def execute_mcp_tool(
 
     engine = BlingMCPEngine(mgr)
     return engine.execute_tool(payload.tool, payload.arguments)
+
+
+@router.get("/mcp/resources")
+def get_mcp_resources(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "view")
+    from app.mcp.bling_mcp import BlingMCPEngine
+
+    engine = BlingMCPEngine(mgr)
+    return {
+        "protocol": "2024-11-05",
+        "resources": engine.get_resource_definitions(),
+    }
+
+
+@router.get("/mcp/prompts")
+def get_mcp_prompts(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    check_permission(mgr, user, "INTEGRACOES", "view")
+    from app.mcp.bling_mcp import BlingMCPEngine
+
+    engine = BlingMCPEngine(mgr)
+    return {
+        "protocol": "2024-11-05",
+        "prompts": engine.get_prompt_definitions(),
+    }
+
+
+@router.post("/mcp/rpc")
+def mcp_jsonrpc_endpoint(
+    payload: Dict[str, Any],
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    """Endpoint oficial JSON-RPC 2.0 padrão da especificação Model Context Protocol (MCP)."""
+    from app.mcp.bling_mcp import BlingMCPEngine
+
+    engine = BlingMCPEngine(mgr)
+    return engine.handle_jsonrpc(payload)
+
+
+@router.get("/mcp/config")
+def get_mcp_client_config(
+    user: Dict[str, Any] = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Retorna snippets de configuração prontos para Claude Desktop, Cursor e Antigravity."""
+    check_permission(None, user, "INTEGRACOES", "view")
+    server_url = "http://127.0.0.1:8765/api/integrations/mcp/rpc"
+    return {
+        "claude_desktop": {
+            "mcpServers": {
+                "crm-globalcards": {
+                    "url": server_url,
+                    "headers": {"Authorization": "Bearer YOUR_CRM_TOKEN"},
+                }
+            }
+        },
+        "cursor": {
+            "mcpServers": {
+                "crm-globalcards": {
+                    "type": "http",
+                    "url": server_url,
+                }
+            }
+        },
+    }
 
 
 @router.get("/meta/oauth/authorize-url")
@@ -404,5 +477,18 @@ def auto_import_all_data(
         "message": "Todos os clientes, produtos e pedidos foram sincronizados com sucesso para o banco DBF local!",
         "details": result,
     }
+
+
+@router.post("/full-sync-omnidirectional")
+def full_sync_omnidirectional(
+    user: Dict[str, Any] = Depends(get_current_user),
+    mgr: DBFManager = Depends(get_dbf_manager),
+) -> Dict[str, Any]:
+    """Sincronização 100% total e bidirecional: Bling ⇄ CRM ⇄ WhatsApp ⇄ Catálogo."""
+    check_permission(mgr, user, "INTEGRACOES", "edit")
+    from app.integrations.sync_orchestrator import SyncOrchestrator
+
+    orchestrator = SyncOrchestrator(mgr)
+    return orchestrator.run_full_bidirectional_sync()
 
 
