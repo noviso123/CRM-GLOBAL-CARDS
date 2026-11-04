@@ -401,20 +401,33 @@ export const MainLayout: React.FC = () => {
               )}
             </Link>
 
-            <Link
-              to="/configuracoes"
-              className="flex items-center gap-2 pl-3 border-l border-slate-200 text-xs font-medium text-slate-700 hover:text-sky-700"
-            >
-              <div className="w-8 h-8 rounded-full bg-[#053679] text-white ring-2 ring-[#ED6706]/40 flex items-center justify-center font-bold">
-                {user?.NOME?.charAt(0) || 'U'}
-              </div>
-              <div className="hidden sm:block text-left">
-                <span className="block font-semibold text-slate-800 leading-tight">
-                  {user?.NOME}
-                </span>
-                <span className="block text-[11px] text-slate-500">{user?.EMAIL}</span>
-              </div>
-            </Link>
+            <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
+              <Link
+                to="/configuracoes"
+                className="flex items-center gap-2 text-xs font-medium text-slate-700 hover:text-[#053679]"
+                title="Ver meu perfil e configurações"
+              >
+                <div className="w-8 h-8 rounded-full bg-[#053679] text-white ring-2 ring-[#ED6706]/40 flex items-center justify-center font-bold shrink-0">
+                  {user?.NOME?.charAt(0) || 'U'}
+                </div>
+                <div className="hidden sm:block text-left">
+                  <span className="block font-semibold text-slate-800 leading-tight truncate max-w-[150px]">
+                    {user?.NOME}
+                  </span>
+                  <span className="block text-[11px] text-slate-500 truncate max-w-[150px]">{user?.EMAIL}</span>
+                </div>
+              </Link>
+
+              <button
+                type="button"
+                onClick={logout}
+                title="Sair da conta"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition border border-transparent hover:border-rose-200 text-xs font-bold shrink-0"
+              >
+                <LogOut className="w-4 h-4 text-slate-400 group-hover:text-rose-600" />
+                <span className="hidden md:inline">Sair</span>
+              </button>
+            </div>
           </div>
         </header>
 
