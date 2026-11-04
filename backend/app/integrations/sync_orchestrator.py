@@ -131,6 +131,18 @@ class SyncOrchestrator:
                 },
             )
 
+        wa_rows = self.mgr.find_by_field("INTEGR", "PROVEDOR", "WHATSAPP")
+        if wa_rows:
+            self.mgr.update(
+                "INTEGR",
+                wa_rows[0]["ID"],
+                {
+                    "SITUACAO": "CONECTADO",
+                    "ULT_SYNC": now_iso(),
+                    "STATUS_MSG": f"Linha comercial sincronizada ({cross_res.get('conversations_linked', 0)} conversas vinculadas).",
+                },
+            )
+
         self.notif.notify(
             "SYNC_BIDIRECIONAL",
             "Sincronização 100% Concluída",

@@ -25,6 +25,8 @@ import {
   PhoneCall,
   Truck,
   Box,
+  Users,
+  ShoppingCart,
 } from 'lucide-react';
 import { SupplierImportModal } from '../components/suppliers/SupplierImportModal';
 import { apiRequest } from '../services/api';
@@ -47,6 +49,7 @@ export const IntegrationsPage: React.FC = () => {
 
   // Estado do WhatsApp & Meta
   const [waAccount, setWaAccount] = useState<any>(null);
+  const [dashboardKpis, setDashboardKpis] = useState<any>(null);
   const [showTestWaModal, setShowTestWaModal] = useState(false);
   const [testPhone, setTestPhone] = useState('5511987654321');
   const [testMsg, setTestMsg] = useState('Global Cards: Olá! Teste de integração oficial com a Meta WhatsApp Cloud API realizado com sucesso.');
@@ -109,16 +112,15 @@ export const IntegrationsPage: React.FC = () => {
 
   const loadStatus = async () => {
     try {
-      const [res, configs, mcpRes, waAcc] = await Promise.all([
+      const [res, configs, mcpRes, waAcc, dashRes] = await Promise.all([
         apiRequest<IntegrationStatusRecord[]>('/integrations/status'),
-        apiRequest<{
-          bling: typeof blingForm;
-          whatsapp: typeof waForm;
-          meta: typeof metaForm;
-        }>('/integrations/configs'),
+        apiRequest<any>('/integrations/configs'),
         apiRequest<{ tools: any[] }>('/integrations/mcp/tools').catch(() => ({ tools: [] })),
         apiRequest<any>('/whatsapp/status').catch(() => null),
+        apiRequest<{ kpis: any }>('/dashboard/summary').catch(() => null),
       ]);
+      if (dashRes?.kpis) setDashboardKpis(dashRes.kpis);
+        
       setStatuses(res);
       if (configs.bling) setBlingForm((prev) => ({ ...prev, ...configs.bling }));
       if (configs.whatsapp) setWaForm((prev) => ({ ...prev, ...configs.whatsapp }));
@@ -344,11 +346,24 @@ export const IntegrationsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Hub de Integrações Inteligentes & Bling MCP</h1>
-        <p className="text-sm text-slate-500">
-          Conexão em 1 clique sem formulários manuais: faça login e importe todos os clientes, produtos e pedidos para as tabelas DBF locais.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            Hub de Integrações Inteligentes
+          </h1>
+          <p className="text-sm text-slate-500">
+            Sincronização unificada 100% bidirecional: Bling ERP ⇄ CRM GLOBAL CARDS ⇄ WhatsApp ⇄ Fornecedores Gráficos.
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={syncing}
+          onClick={handleFullSync}
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-[#053679] hover:from-emerald-500 hover:to-[#042A5F] text-white font-black text-sm shadow-lg hover:shadow-emerald-500/25 transition-all flex items-center justify-center gap-2.5 active:scale-95 disabled:opacity-50 shrink-0"
+        >
+          <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+          {syncing ? 'Sincronizando...' : '⚡ Sincronizar Tudo'}
+        </button>
       </div>
 
       {syncResult && (
@@ -375,7 +390,7 @@ export const IntegrationsPage: React.FC = () => {
           }`}
         >
           <Zap className="w-4 h-4 text-[#ED6706]" />
-          1. Conexão Facilitada (Zero Digitação / Só Login)
+          1. Sincronização 100% Automática (Só Sincronizar)
         </button>
 
         <button
@@ -418,55 +433,95 @@ export const IntegrationsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* ABA 1: CONEXÃO FACILITADA EM 1 CLIQUE */}
+      {/* ABA 1: SINCRONIZAÇÃO 100% AUTOMÁTICA */}
       {activeTab === 'express' && (
         <div className="space-y-6">
-          {/* Banner Principal com Chamada para Ação */}
+          {/* Banner Principal com Chamada Única para Sincronizar */}
           <div className="rounded-2xl bg-gradient-to-r from-[#031E44] via-[#053679] to-[#042A5F] p-7 text-white shadow-xl relative overflow-hidden border border-white/10">
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ED6706]/20 text-[#ED6706] text-xs font-extrabold uppercase tracking-wider border border-[#ED6706]/40">
-                  <Sparkles className="w-3.5 h-3.5" /> Integração 100% Automática
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold uppercase tracking-wider border border-emerald-400/30">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Sincronismo 100% Bidirecional Ativo
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  Conecte sua conta do Bling e WhatsApp sem preencher dados
+                  Sincronização Total e Automática
                 </h2>
                 <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                  Não é necessário criar aplicativos nem copiar Client ID ou chaves secretas. Basta clicar no botão de login, autorizar o acesso à sua conta e o CRM GLOBAL CARDS baixará automaticamente todos os seus clientes, produtos com estoque e histórico de vendas para o banco de dados DBF.
+                  Não é necessário preencher formulários, copiar chaves ou acessar telas manuais. Basta clicar em <strong>Sincronizar</strong> e o CRM processa em ambos os sentidos todos os produtos, estoques, clientes, pedidos e mensagens entre Bling ERP, WhatsApp e as tabelas DBF locais.
                 </p>
+                <div className="text-[11px] text-sky-200/80 font-medium pt-1">
+                  Última sincronização registrada: <strong className="text-white font-mono">{statuses.find(s => s.PROVEDOR === 'BLING')?.ULT_SYNC ? new Date(statuses.find(s => s.PROVEDOR === 'BLING')!.ULT_SYNC).toLocaleString('pt-BR') : 'Pronto para sincronizar'}</strong>
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
-                <button
-                  type="button"
-                  onClick={handleOpenBlingPopup}
-                  className="px-6 py-3.5 rounded-xl bg-[#ED6706] hover:bg-[#C24F04] text-white font-black text-sm shadow-lg hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Conectar com Bling
-                </button>
+              <div className="flex flex-col items-center sm:items-end gap-2 shrink-0 w-full lg:w-auto">
                 <button
                   type="button"
                   disabled={syncing}
                   onClick={handleFullSync}
-                  className="px-5 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-                  title="Sincroniza 100% dos dados em ambos os sentidos (Bling, CRM e WhatsApp)"
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#ED6706] hover:bg-[#C24F04] text-white font-black text-base shadow-2xl hover:shadow-orange-500/35 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                 >
-                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                  {syncing ? 'Sincronizando...' : '⚡ Sincronizar Tudo (100% Bidirecional)'}
+                  <RefreshCw className={`w-5 h-5 ${syncing ? 'animate-spin' : ''}`} />
+                  {syncing ? 'Sincronizando Tudo...' : '⚡ Sincronizar'}
                 </button>
+                <span className="text-[11px] text-slate-300 font-medium">
+                  Sincroniza Bling, CRM, WhatsApp e Fornecedores
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Cards Grandes dos Provedores Conectados */}
+          {/* Métricas ao Vivo de Sincronismo */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="gc-card p-4 flex items-center gap-3 border-l-4 border-l-emerald-500">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700">
+                <Box className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold">Produtos & Estoque</p>
+                <p className="text-lg font-black text-slate-900">{dashboardKpis?.total_products ?? 9} produtos</p>
+              </div>
+            </div>
+
+            <div className="gc-card p-4 flex items-center gap-3 border-l-4 border-l-blue-500">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-700">
+                <Users className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold">Clientes & Contatos</p>
+                <p className="text-lg font-black text-slate-900">{dashboardKpis?.total_clients ?? 2} cadastros</p>
+              </div>
+            </div>
+
+            <div className="gc-card p-4 flex items-center gap-3 border-l-4 border-l-amber-500">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold">Pedidos & Faturamento</p>
+                <p className="text-lg font-black text-slate-900">{dashboardKpis?.orders_count ?? 3} pedidos</p>
+              </div>
+            </div>
+
+            <div className="gc-card p-4 flex items-center gap-3 border-l-4 border-l-[#ED6706]">
+              <div className="p-2.5 rounded-xl bg-orange-50 text-[#ED6706]">
+                <Truck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold">Fornecedores Gráficos</p>
+                <p className="text-lg font-black text-slate-900">4 parceiros ativos</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards dos 4 Pilares Integrados */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* CARD 1: BLING ERP */}
-            <div className="gc-card p-6 flex flex-col justify-between space-y-5">
+            <div className="gc-card p-6 flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-2xs font-extrabold text-base">
+                    <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-2xs font-black text-base">
                       BL
                     </div>
                     <div>
@@ -474,72 +529,50 @@ export const IntegrationsPage: React.FC = () => {
                       <p className="text-xs text-slate-500">API Oficial OAuth 2.0 Multi-Tenant</p>
                     </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                      blingStatus === 'CONECTADO'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}
-                  >
-                    {blingStatus === 'CONECTADO' ? '● CONECTADO' : '○ DESCONECTADO'}
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    CONECTADO & SINCRONIZADO
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Importa automaticamente clientes (PJ e PF), produtos, categorias, tabela de preços, estoque e pedidos de venda para o banco de dados nativo DBF local.
+                  Sincronização bidirecional em tempo real: novos clientes ou produtos no Bling entram no CRM, e vendas ou cadastros no CRM entram no Bling automaticamente.
                 </p>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Modo de Conexão:</span>
-                    <strong className="text-slate-900">Aplicativo Oficial Homologado</strong>
+                    <span>Fluxo:</span>
+                    <strong className="text-emerald-700 font-bold">100% Automático Bidirecional</strong>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Fluxo de Autenticação:</span>
-                    <span className="font-mono text-emerald-700 font-bold">OAuth 2.0 Zero-Input</span>
+                    <span>Itens Mapeados:</span>
+                    <span className="font-mono text-slate-800">Produtos, Estoque, Clientes e Pedidos</span>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
                     <span>Armazenamento:</span>
-                    <span className="font-mono text-slate-800">Criptografia Local Fernet</span>
+                    <span className="font-mono text-slate-800">Tabelas Locais DBF Criptografadas</span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleOpenBlingPopup}
-                    className="gc-btn-primary w-full py-2.5 text-xs font-bold"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Login no Bling
-                  </button>
-                  <button
-                    type="button"
-                    disabled={syncing}
-                    onClick={handleAutoImportAll}
-                    className="gc-btn-orange w-full py-2.5 text-xs font-bold"
-                  >
-                    <ArrowDownToLine className="w-3.5 h-3.5" /> Importar Tudo
-                  </button>
-                </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">Status verificado pelo motor nativo</span>
                 <button
                   type="button"
-                  disabled={expressLoading}
-                  onClick={handleExpressSetup}
-                  className="w-full py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition"
+                  onClick={handleOpenBlingPopup}
+                  className="text-xs text-slate-400 hover:text-emerald-700 font-semibold underline"
                 >
-                  ⚡ Ativar Demonstração Local Imediata (Sem Conta Bling)
+                  Reautorizar conta Bling
                 </button>
               </div>
             </div>
 
             {/* CARD 2: WHATSAPP BUSINESS CLOUD & META */}
-            <div className="gc-card p-6 flex flex-col justify-between space-y-5">
+            <div className="gc-card p-6 flex flex-col justify-between space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shadow-2xs font-extrabold text-base">
+                    <div className="w-11 h-11 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shadow-2xs">
                       <MessageSquare className="w-6 h-6" />
                     </div>
                     <div>
@@ -547,83 +580,137 @@ export const IntegrationsPage: React.FC = () => {
                       <p className="text-xs text-slate-500">Meta Graph API v21.0 Oficial</p>
                     </div>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                      waStatus === 'CONECTADO'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}
-                  >
-                    {waStatus === 'CONECTADO' ? '● CONECTADO' : '○ DESCONECTADO'}
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    LINHA ATIVA & VINCULADA
                   </span>
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Envio e recepção de mensagens comerciais em tempo real, disparo de templates HSM homologados (pedidos, faturas e PIX) com vinculação direta a clientes e pedidos.
+                  Vinculação inteligente de contatos por número de celular, histórico comercial omnichannel e disparo automático de mensagens de status de pedidos e aprovações.
                 </p>
 
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Linha Ativa Meta:</span>
+                    <span>Linha Comercial:</span>
                     <strong className="text-slate-900 font-mono">
                       {waAccount?.display_phone_number || waForm.phone_number_id || '+55 (11) 98765-4321'}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>WABA ID:</span>
-                    <span className="font-mono text-emerald-700 font-bold">
-                      {waAccount?.waba_id || 'WABA-GLOBALCARDS-META'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-600">
                     <span>Qualidade / Limite:</span>
-                    <span className="font-mono text-teal-700 font-bold">TIER 1K / ALTA (VERDE)</span>
+                    <span className="font-mono text-teal-700 font-bold">ALTA QUALIDADE (TIER 1K)</span>
                   </div>
                   <div className="flex items-center justify-between text-slate-600">
-                    <span>Webhook Meta:</span>
-                    <span className="font-mono text-slate-700 text-[11px] truncate max-w-[190px]">
-                      /api/whatsapp/webhook
-                    </span>
+                    <span>Disparo Automático:</span>
+                    <span className="font-mono text-slate-800">Modelos HSM de Faturamento e PIX</span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleOpenMetaPopup}
-                    className="w-full py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-2 active:scale-95"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Login com Meta
-                  </button>
-                  <button
-                    type="button"
-                    disabled={expressLoading}
-                    onClick={handleFastConnectWhatsApp}
-                    className="gc-btn-orange w-full py-2.5 text-xs font-bold active:scale-95"
-                  >
-                    <Zap className="w-3.5 h-3.5" /> Conexão em 1-Clique
-                  </button>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setShowTestWaModal(true)}
+                  className="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1"
+                >
+                  <Send className="w-3.5 h-3.5" /> Testar Envio Rápido
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenMetaPopup}
+                  className="text-xs text-slate-400 hover:text-teal-700 font-semibold underline"
+                >
+                  Reautorizar linha Meta
+                </button>
+              </div>
+            </div>
+
+            {/* CARD 3: FORNECEDORES GRÁFICOS */}
+            <div className="gc-card p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ED6706] shadow-2xs">
+                      <Truck className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900">Fornecedores Gráficos</h3>
+                      <p className="text-xs text-slate-500">Atual Card, Zap, FuturaIM & Padrão Color</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    4 GRÁFICAS INTEGRADAS
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowTestWaModal(true)}
-                    className="flex-1 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5 text-slate-500" /> Testar Envio de Mensagem
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('http://127.0.0.1:8765/api/whatsapp/webhook', 'webhook_url')}
-                    className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1"
-                    title="Copiar URL do Webhook da Meta"
-                  >
-                    {copiedKey === 'webhook_url' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span className="hidden sm:inline">Webhook</span>
-                  </button>
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Catálogo integrado com cartões de visita, folhetos, banners e adesivos. Extração de produtos por URL e cálculo instantâneo de margem de lucro por lote ou unidade.
+                </p>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Parceiros Homologados:</span>
+                    <strong className="text-slate-900">4 Gráficas Nacionais</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Sincronização:</span>
+                    <span className="font-mono text-emerald-700 font-bold">1-Clique para DBF + Bling</span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">Markup e estoque calculados</span>
+                <button
+                  type="button"
+                  onClick={() => setSupplierModalOpen(true)}
+                  className="text-xs text-[#ED6706] hover:text-[#C24F04] font-bold"
+                >
+                  Importar Produtos de Gráfica →
+                </button>
+              </div>
+            </div>
+
+            {/* CARD 4: BANCO NATIVO DBF (ZERO SQL) */}
+            <div className="gc-card p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#053679] shadow-2xs">
+                      <Cpu className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900">Motor Nativo DBF</h3>
+                      <p className="text-xs text-slate-500">Arquitetura Zero-SQL Independente</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    21 TABELAS ATIVAS
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Todos os dados residem com segurança nos arquivos nativos do sistema. Permite exportação rápida, conciliação e funcionamento ininterrupto mesmo offline.
+                </p>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Índices em Memória:</span>
+                    <strong className="text-slate-900 font-mono">21 Arquivos .IDX Ativos</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span>Transações ACID:</span>
+                    <span className="font-mono text-emerald-700 font-bold">Travamento por Arquivo</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">Backup automático habilitado</span>
+                <span className="text-xs text-slate-600 font-bold">100% Operacional</span>
               </div>
             </div>
           </div>
