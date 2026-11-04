@@ -104,7 +104,22 @@ export const MainLayout: React.FC = () => {
         // silent fallback
       }
     };
+
     void fetchTopbarStatus();
+
+    const handleNotificationsUpdated = () => {
+      void fetchTopbarStatus();
+    };
+
+    window.addEventListener('crm-notifications-updated', handleNotificationsUpdated);
+    window.addEventListener('storage', handleNotificationsUpdated);
+    const interval = setInterval(fetchTopbarStatus, 20000);
+
+    return () => {
+      window.removeEventListener('crm-notifications-updated', handleNotificationsUpdated);
+      window.removeEventListener('storage', handleNotificationsUpdated);
+      clearInterval(interval);
+    };
   }, [location.pathname]);
 
   useEffect(() => {

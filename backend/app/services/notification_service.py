@@ -56,6 +56,28 @@ class NotificationService:
             count += 1
         return count
 
+    def delete_notification(self, notification_id: str) -> bool:
+        ok = self.mgr.delete("NOTIFIC", notification_id)
+        if ok:
+            try:
+                self.mgr.pack_table("NOTIFIC")
+            except Exception:
+                pass
+        return ok
+
+    def clear_all(self, user_id: str) -> int:
+        all_notifs = self.list_notifications(user_id=user_id, unread_only=False)
+        count = 0
+        for n in all_notifs:
+            if self.mgr.delete("NOTIFIC", n["ID"]):
+                count += 1
+        if count > 0:
+            try:
+                self.mgr.pack_table("NOTIFIC")
+            except Exception:
+                pass
+        return count
+
     def record_history(
         self,
         entidade: str,

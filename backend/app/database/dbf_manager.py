@@ -218,6 +218,11 @@ class DBFManager:
                 if rec and rec.get("ID") == record_id:
                     self.indexes.unindex_record(schema, pos, rec, flush=True)
                     return conn.mark_deleted_at(pos)
+            # Fallback seguro para escanear a tabela ativa caso o índice esteja desatualizado
+            for pos, rec in conn.iter_active_records():
+                if rec and rec.get("ID") == record_id:
+                    self.indexes.unindex_record(schema, pos, rec, flush=True)
+                    return conn.mark_deleted_at(pos)
             return False
 
     def pack_table(self, table_name: str) -> Dict[str, int]:

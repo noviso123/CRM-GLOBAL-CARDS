@@ -1,1 +1,1 @@
-{"table": "ATIVIDAD", "crc32": 210964387, "data": {"ID": {}, "ID_CLIENTE": {}, "ID_OPORT": {}, "ID_RESP": {}, "DATA_AG": {}, "SITUACAO": {}}}
+{"table": "ATIVIDAD", "crc32": 2480946655, "data": {"ID": {"01A1A360-70C6-7E96-B1D4-2423CCAA40E7": [0], "01A1A365-C2C4-7AAC-867E-4C69F3B2FAB2": [1]}, "ID_CLIENTE": {"": [0, 1]}, "ID_OPORT": {"": [0, 1]}, "ID_RESP": {"MCP_AGENT": [0, 1]}, "DATA_AG": {"2026-11-03": [0, 1]}, "SITUACAO": {"PENDENTE": [0, 1]}}}
